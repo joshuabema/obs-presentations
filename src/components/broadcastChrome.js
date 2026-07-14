@@ -10,10 +10,25 @@ const ICONS = {
   audio: '<svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6L8 10H4zM17 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/></svg>',
   video: '<svg viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg>',
   wifi: '<svg viewBox="0 0 24 24"><path d="M2 8a15 15 0 0 1 20 0M5 12a10.5 10.5 0 0 1 14 0M8.5 15.5a5.2 5.2 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/></svg>',
+  link: '<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/></svg>',
+  user: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.5-5 3.2-7.5 8-7.5s7.5 2.5 8 7.5"/></svg>',
+  refresh: '<svg viewBox="0 0 24 24"><path d="M20 7V3l-2.2 2.2A8 8 0 1 0 20 14M4 17v4l2.2-2.2"/></svg>',
+  play: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></svg>',
+  megaphone: '<svg viewBox="0 0 24 24"><path d="m4 13 13 5V5L4 10v3ZM17 9c2 0 3 1 3 2.5S19 14 17 14M7 14l1 5h4l-2-4"/></svg>',
+  calendar: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h2M14 14h2M8 17h2"/></svg>',
+  crown: '<svg viewBox="0 0 24 24"><path d="m3 7 5 4 4-7 4 7 5-4-2 11H5L3 7ZM5 21h14"/></svg>',
+  star: '<svg viewBox="0 0 24 24"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.2L5.8 21 7 14.2l-5-4.9 6.9-1L12 2Z"/></svg>',
+  trophy: '<svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0V4ZM8 6H4v2c0 3 2 4 5 4M16 6h4v2c0 3-2 4-5 4M12 13v5M8 21h8M9 18h6"/></svg>',
+  handshake: '<svg viewBox="0 0 24 24"><path d="m3 8 4-3 4 2 2-1 4 2 4 4-6 6-3-2-2 1-7-7V8ZM8 13l3-3 5 5M10 17l-2 2M13 18l-1 2"/></svg>',
+  clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>',
+  shield: '<svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.2 8.5 8 11 4.8-2.5 8-6 8-11V5l-8-3Z"/><path d="m8 12 2.5 2.5L16 9"/></svg>',
+  target: '<svg viewBox="0 0 24 24"><circle cx="11" cy="13" r="8"/><circle cx="11" cy="13" r="3"/><path d="m13 11 7-7M16 4h4v4"/></svg>',
+  gift: '<svg viewBox="0 0 24 24"><path d="M3 10h18v11H3zM2 6h20v4H2zM12 6v15M12 6H8.5a2.5 2.5 0 1 1 2.5-2.5L12 6Zm0 0h3.5A2.5 2.5 0 1 0 13 3.5L12 6Z"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16.5 8"/></svg>',
 }
 
 export function icon(name) {
-  return `<span class="broadcast-icon" aria-hidden="true">${ICONS[name] ?? ICONS.signal}</span>`
+  return `<span class="broadcast-icon" data-icon-name="${name}" data-icon-fallback="${ICONS[name] ? 'false' : 'true'}" aria-hidden="true">${ICONS[name] ?? ICONS.signal}</span>`
 }
 
 export function renderBrand({ enrollment = false } = {}) {

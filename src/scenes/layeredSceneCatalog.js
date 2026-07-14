@@ -4,8 +4,8 @@ export const layeredSceneCatalog = {
   '06': {
     title: 'WHAT IS BEMA HUB?', subtitle: 'A creative economy platform built on mutual exchange.', layout: 'cards',
     items: [
-      card('Professional Creators', 'Bring original creative value, experiences, and ideas to Bema Hub.', 'music', '', 'blue', 'highlight-creators'),
-      card('Participation Assets', 'Access creative value through LoopCode, Loop Activity, and VIP experiences.', 'heart', '', 'cyan', 'highlight-assets'),
+      card('Professional Creators', 'Bring original creative value, experiences, and ideas to Bema Hub.', 'user', '', 'blue', 'highlight-creators'),
+      card('Participation Assets', 'Access creative value through LoopCode, Loop Activity, and VIP experiences.', 'play', '', 'cyan', 'highlight-assets'),
       card('Builders Help Value Move', 'Builders extend reach with LoopLink and LoopLock through the community.', 'people', '', 'purple', 'highlight-builders'),
     ],
     callout: 'Creators bring real value. Builders help it reach more people.',
@@ -14,7 +14,7 @@ export const layeredSceneCatalog = {
   '07': {
     title: 'WHAT IS BEMA CORE?', subtitle: 'Community of Rewarded Engagement.', layout: 'cards',
     items: [
-      card('Mutual Exchange', 'Participants access real creative value.', 'heart', '', 'cyan', 'pillar-exchange'),
+      card('Mutual Exchange', 'Participants access real creative value.', 'refresh', '', 'cyan', 'pillar-exchange'),
       card('Builders in Action', 'Builders help that value reach more people.', 'people', '', 'blue', 'pillar-builders'),
       card('Sustainable Creative Economy', 'Creators gain a stronger path to keep creating.', 'chart', '', 'purple', 'pillar-economy'),
     ],
@@ -24,19 +24,19 @@ export const layeredSceneCatalog = {
   '09': {
     title: 'PROGRAMS OVERVIEW', subtitle: 'Explore the core experiences inside Bema Hub.', layout: 'cards', columns: 2,
     items: [
-      card('Campaigns', 'Participate in creator-led experiences.', 'chart', '', 'blue', 'program-campaigns'),
-      card('Events', 'Join live moments and community gatherings.', 'signal', '', 'cyan', 'program-events'),
+      card('Campaigns', 'Participate in creator-led experiences.', 'megaphone', '', 'blue', 'program-campaigns'),
+      card('Events', 'Join live moments and community gatherings.', 'calendar', '', 'purple', 'program-events'),
       card('Changemakers', 'Discover people making meaningful impact.', 'people', '', 'purple', 'program-changemakers'),
-      card('Creator Stories', 'See real progress and proof updates.', 'music', '', 'blue', 'program-stories'),
+      card('Creator Stories', 'See real progress and proof updates.', 'play', '', 'purple', 'program-stories'),
     ],
     footer: [['chart', 'Campaigns'], ['signal', 'Events'], ['people', 'Changemakers'], ['music', 'Creator Stories']],
   },
   '10': {
     title: 'PARTICIPATION JOURNEY', subtitle: 'How a Builder moves through the experience.', layout: 'flow',
     items: [
-      card('Choose Access Level', 'Select the campaign experience that fits.', 'people', '01', 'cyan', 'journey-1'),
-      card('Receive Participation Assets', 'Unlock creator value and experiences.', 'heart', '02', 'blue', 'journey-2'),
-      card('Activate LoopLink or LoopCode', 'Use your personal participation tools.', 'signal', '03', 'purple', 'journey-3'),
+      card('Choose Access Level', 'Select the campaign experience that fits.', 'crown', '01', 'blue', 'journey-1'),
+      card('Receive Participation Assets', 'Unlock creator value and experiences.', 'gift', '02', 'blue', 'journey-2'),
+      card('Activate LoopLink or LoopCode', 'Use your personal participation tools.', 'link', '03', 'blue', 'journey-3'),
       card('Another Person Participates', 'A confirmed participation creates a LoopLock.', 'people', '04', 'cyan', 'journey-4'),
       card('Loop Activity Grows', 'Your verified movement becomes visible.', 'chart', '05', 'blue', 'journey-5'),
     ],
@@ -46,7 +46,7 @@ export const layeredSceneCatalog = {
   '11': {
     title: 'ECHOLOOP EXPLAINED', subtitle: 'Four connected tools that make participation visible.', layout: 'flow',
     items: [
-      card('LoopLink', 'Your personal sharing link.', 'signal', '01', 'blue', 'term-looplink'),
+      card('LoopLink', 'Your personal sharing link.', 'link', '01', 'blue', 'term-looplink'),
       card('LoopCode', 'Your personal share code.', 'qr', '02', 'cyan', 'term-loopcode'),
       card('LoopLock', 'A confirmed participation through your tools.', 'lock', '03', 'purple', 'term-looplock'),
       card('Loop Activity', 'Where movement and impact are tracked.', 'chart', '04', 'blue', 'term-activity'),
@@ -57,9 +57,9 @@ export const layeredSceneCatalog = {
   '12': {
     title: 'ACCESS LEVELS', subtitle: 'The vertical climb within the campaign.', layout: 'stack',
     items: [
-      card('Participation Level', 'Entry point into the campaign experience.', 'people', '01', 'cyan', 'level-participation'),
-      card('VIP Access', 'Deeper creator assets and a more connected experience.', 'heart', '02', 'blue', 'level-vip'),
-      card('Signature VIP', 'Deepest access, exclusive assets, and identity-based participation.', 'lock', '03', 'purple', 'level-signature'),
+      card('Participation Level', 'Entry point into the campaign experience.', 'user', '01', 'cyan', 'level-participation'),
+      card('VIP Access', 'Deeper creator assets and a more connected experience.', 'star', '02', 'purple', 'level-vip'),
+      card('Signature VIP', 'Deepest access, exclusive assets, and identity-based participation.', 'crown', '03', 'amber', 'level-signature'),
     ],
     callout: 'Access Levels determine what you receive, not your Recognized Impact rate.',
     footer: [['people', 'Participation Level'], ['heart', 'VIP Access'], ['lock', 'Signature VIP']],
@@ -67,11 +67,11 @@ export const layeredSceneCatalog = {
   '13': {
     title: 'COMMUNITY BUILDER TIERS', subtitle: 'The horizontal spread of Loop Activity.', layout: 'flow', compact: true,
     items: [
-      card('Builder', 'First active step.', 'people', '01', 'cyan', 'tier-builder'),
-      card('Advocate', 'Intentional sharing and trust.', 'signal', '02', 'blue', 'tier-advocate'),
-      card('Champion', 'Stronger campaign movement.', 'chart', '03', 'purple', 'tier-champion'),
-      card('Partner', 'Meaningful reach and deeper alignment.', 'heart', '04', 'blue', 'tier-partner'),
-      card('Partner Elite', 'Highest Community Builder Tier.', 'lock', '05', 'purple', 'tier-elite'),
+      card('Builder', 'First active step.', 'user', '01', 'cyan', 'tier-builder'),
+      card('Advocate', 'Intentional sharing and trust.', 'people', '02', 'blue', 'tier-advocate'),
+      card('Champion', 'Stronger campaign movement.', 'trophy', '03', 'purple', 'tier-champion'),
+      card('Partner', 'Meaningful reach and deeper alignment.', 'handshake', '04', 'blue', 'tier-partner'),
+      card('Partner Elite', 'Highest Community Builder Tier.', 'crown', '05', 'amber', 'tier-elite'),
     ],
     callout: 'Community Builder Tiers are earned through Loop Activity and qualifying LoopLocks. They are not purchased.',
     footer: [['people', 'Community Builder Tiers'], ['chart', 'Loop Activity'], ['lock', 'Qualifying LoopLocks']],
@@ -79,12 +79,12 @@ export const layeredSceneCatalog = {
   '15': {
     title: 'LOOP ACTIVITY & RECOGNIZED IMPACT', subtitle: 'Clear status. Verified movement. Transparent results.', layout: 'status', compact: true,
     items: [
-      card('Pending LoopLock', 'Submitted and awaiting review.', 'signal', 'PENDING', 'amber', 'status-pending'),
-      card('Confirmed LoopLock', 'Verified and confirmed as valid.', 'lock', 'VERIFIED', 'blue', 'status-confirmed'),
-      card('Qualified LoopLock', 'Meets campaign criteria and is eligible.', 'heart', 'QUALIFIED', 'cyan', 'status-qualified'),
+      card('Pending LoopLock', 'Loop activity submitted and awaiting review.', 'clock', 'PENDING', 'amber', 'status-pending'),
+      card('Confirmed LoopLock', 'Loop activity verified and confirmed as valid.', 'shield', 'VERIFIED', 'blue', 'status-confirmed'),
+      card('Qualified LoopLock', 'LoopLock meets campaign criteria and is eligible.', 'star', 'QUALIFIED', 'cyan', 'status-qualified'),
       card('Recognized Impact Pending', 'Qualified activity is under impact review.', 'chart', 'IN REVIEW', 'purple', 'status-impact-pending'),
-      card('Recognized Impact Confirmed', 'Impact verified per campaign rules.', 'heart', 'CONFIRMED', 'blue', 'status-impact-confirmed'),
-      card('Recognized Impact Released', 'Impact recorded and reflected in totals.', 'signal', 'RELEASED', 'cyan', 'status-released'),
+      card('Recognized Impact Confirmed', 'Impact verified and confirmed per campaign rules.', 'check', 'CONFIRMED', 'blue', 'status-impact-confirmed'),
+      card('Recognized Impact Released', 'Recognized Impact recorded and reflected in totals.', 'megaphone', 'RELEASED', 'cyan', 'status-released'),
     ],
     callout: 'Qualified LoopLocks may contribute to Recognized Impact according to campaign rules.',
     footer: [['chart', 'Loop Activity'], ['heart', 'Recognized Impact'], ['lock', 'Qualified LoopLocks']],
