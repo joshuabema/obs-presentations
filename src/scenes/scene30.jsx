@@ -1,3 +1,5 @@
+import { renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+
 // Scene 30 owns these design primitives so it can be edited independently.
 const ICONS = {
   people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c.4-4 2.3-6 6-6s5.6 2 6 6M14 14c3.8-.7 6.1 1 6.5 4.5"/></svg>',
@@ -160,8 +162,19 @@ const config = {
 export const scene30 = {
   presenterZone: 'left',
   renderUnderlay() {
-    const body = `<div class="scene30-impact-board h-full"><section class="scene30-metrics">${config.items.slice(0, 3).map((item) => `<article class="rounded-2xl border border-sky-200/70 bg-white/95 shadow-card">${icon(item.icon)}<div><small>${item.title}</small><strong>${item.value}</strong><span>${item.copy}</span></div></article>`).join('')}</section><section class="scene30-impact-status rounded-2xl border border-sky-200/70 bg-white/95 shadow-card">${icon('award')}<div><small>RECOGNIZED IMPACT STATUS</small><h3>On Track!</h3><p>You’re building meaningful impact.<br />Keep going!</p></div></section><section class="scene30-tier rounded-2xl border border-sky-200/70 bg-white/95 shadow-card"><div><small>BUILDER TIER PROGRESS</small><h3>Silver Builder</h3><strong>2,460 / 5,000 pts</strong><progress value="49" max="100"></progress></div>${icon('shield')}<b>49%</b></section><section class="scene30-activity rounded-2xl border border-sky-200/70 bg-white/95 shadow-card"><header><strong>RECENT ACTIVITY</strong><a>View all</a></header><div><p>${icon('link')}<span>LoopLink shared<small>10m ago</small></span></p><p>${icon('lock')}<span>LoopLock qualified<small>1h ago</small></span></p><p>${icon('star')}<span>Impact recognized<small>3h ago</small></span></p></div></section></div>`
-    return renderLayeredUnderlay('30', config, body)
+    const metrics = config.items.slice(0, 3)
+    const activity = [
+      ['link', 'LoopLink shared', '10m ago'],
+      ['lock', 'LoopLock qualified', '1h ago'],
+      ['star', 'Impact recognized', '3h ago'],
+    ]
+    const body = `<div class="grid h-full grid-cols-6 grid-rows-[165px_180px_145px] content-center gap-4">
+      ${metrics.map((item, index) => `<article class="col-span-2 flex items-center gap-5 rounded-2xl border border-sky-200 bg-white/95 p-5 shadow-xl" data-control-cue="${item.cue}"><span class="grid size-[72px] shrink-0 place-items-center rounded-full ${index === 1 ? 'bg-violet-50 text-violet-600' : index === 2 ? 'bg-blue-50 text-blue-600' : 'bg-cyan-50 text-cyan-600'} [&_.broadcast-icon]:size-11">${icon(item.icon)}</span><div><small class="font-black tracking-wide text-slate-500">${item.title.toUpperCase()}</small><strong class="mt-2 block text-[36px] font-black ${index === 1 ? 'text-violet-600' : index === 2 ? 'text-blue-600' : 'text-cyan-600'}">${item.value}</strong><span class="text-sm font-semibold text-slate-600">${item.copy}</span></div></article>`).join('')}
+      <article class="col-span-3 flex items-center gap-5 rounded-2xl border border-sky-200 bg-white/95 p-5 shadow-xl"> <span class="grid size-[80px] place-items-center rounded-full bg-cyan-50 text-cyan-600 [&_.broadcast-icon]:size-12">${icon('award')}</span><div><small class="font-black text-slate-500">RECOGNIZED IMPACT STATUS</small><h3 class="mt-2 text-3xl font-black text-cyan-600">On Track!</h3><p class="mt-1 font-semibold text-slate-600">You’re building meaningful impact.<br/>Keep going!</p></div></article>
+      <article class="col-span-3 grid grid-cols-[1fr_100px] items-center rounded-2xl border border-sky-200 bg-white/95 p-5 shadow-xl"><div><small class="font-black text-slate-500">BUILDER TIER PROGRESS</small><h3 class="mt-2 text-2xl font-black text-blue-600">Silver Builder</h3><strong>2,460 / 5,000 pts</strong><div class="mt-3 h-3 overflow-hidden rounded-full bg-slate-200"><i class="block h-full w-[49%] rounded-full bg-blue-600"></i></div></div><span class="grid size-20 place-items-center rounded-full bg-blue-50 text-blue-600 [&_.broadcast-icon]:size-12">${icon('shield')}</span></article>
+      <article class="col-span-6 rounded-2xl border border-sky-200 bg-white/95 px-6 py-4 shadow-xl"><header class="flex items-center justify-between"><strong>RECENT ACTIVITY</strong><a class="text-sm font-bold text-violet-600">View all</a></header><div class="mt-3 grid grid-cols-3 divide-x">${activity.map(([name,label,time], index) => `<div class="flex items-center gap-4 px-5 first:pl-0"><span class="grid size-12 place-items-center rounded-full ${index === 1 ? 'bg-violet-50 text-violet-600' : 'bg-cyan-50 text-cyan-600'} [&_.broadcast-icon]:size-7">${icon(name)}</span><strong>${label}<small class="block font-semibold text-slate-500">${time}</small></strong></div>`).join('')}</div></article>
+    </div>`
+    return renderTailwindUnderlay({ title: config.title, subtitle: config.subtitle, body })
   },
-  renderForeground() { return renderLayeredForeground('30', config) },
+  renderForeground() { return renderTailwindForeground(['♙ My Impact', '⌁ Loop Activity', '▣ Qualified LoopLocks', '▥ Builder Progress']) },
 }

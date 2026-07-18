@@ -1,3 +1,5 @@
+import { renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+
 // Scene 21 owns these design primitives so it can be edited independently.
 const ICONS = {
   people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c.4-4 2.3-6 6-6s5.6 2 6 6M14 14c3.8-.7 6.1 1 6.5 4.5"/></svg>',
@@ -156,9 +158,27 @@ const config = {
 export const scene21 = {
   presenterZone: 'left',
   renderUnderlay() {
-    const activity = ['Alex joined via LoopLink', 'Taylor joined via LoopCode', 'Jamie joined via LoopLink', 'Morgan activated a code']
-    const body = `<div class="reference-tools-layout h-full"><section class="tools-main-panel rounded-panel border border-sky-200/70 bg-white/95 shadow-card">${config.items.slice(0, 2).map((item, index) => `<article class="tool-card tone-${item.tone}" data-control-cue="${item.cue}"><header>${icon(item.icon)}<div><small>PERSONAL TOOL</small><h3>${item.title}</h3></div><strong>ACTIVE</strong></header><div class="tool-value"><code>${item.copy}</code><button>${index ? 'Reveal code' : 'Copy link'}</button></div><footer><span>${item.value}</span><i></i><span>Ready to share</span></footer></article>`).join('')}<div class="tools-callout">${icon('shield')}<strong>${config.callout}</strong></div></section><aside class="rounded-panel border border-sky-200/70 bg-white/95 shadow-card"><header>${icon('people')}<div><small>LIVE</small><h3>Loop Activity</h3></div><strong>12 JOINED</strong></header>${activity.map((text, index) => `<article><b>${['A', 'T', 'J', 'M'][index]}</b><span>${text}<small>${index + 1} min ago</small></span><i>✓</i></article>`).join('')}</aside></div>`
-    return renderLayeredUnderlay('21', config, body)
+    const activity = [['A', 'Alex M.', 'Joined via LoopLink', '2m ago'], ['T', 'Taylor R.', 'Joined via LoopCode', '5m ago'], ['J', 'Jamie K.', 'Joined via LoopLink', '7m ago']]
+    const body = `<div class="grid h-full grid-cols-[minmax(0,1fr)_300px] gap-6">
+      <section class="overflow-hidden rounded-[28px] border border-sky-200/80 bg-white/95 p-7 shadow-2xl">
+        <article class="grid grid-cols-[76px_1fr] gap-5 border-b border-dashed border-cyan-300 pb-6" data-control-cue="copy-link">
+          <span class="grid size-[76px] place-items-center rounded-full bg-cyan-50 text-cyan-500 [&_.broadcast-icon]:size-11">${icon('link')}</span>
+          <div><h3 class="text-[28px] font-black text-cyan-600">LoopLink</h3><p class="text-lg font-semibold">Your unique shareable link.</p><div class="mt-4 flex gap-3"><code class="flex-1 rounded-lg border-2 border-cyan-300 px-4 py-3 text-base font-bold">https://bemahub.com/join/joyceroot</code><button class="rounded-lg bg-cyan-500 px-6 font-black text-white">Copy</button><button class="rounded-lg border-2 border-cyan-500 px-5 font-black text-cyan-600">Share</button></div></div>
+        </article>
+        <article class="grid grid-cols-[76px_1fr] gap-5 pt-6" data-control-cue="reveal-code">
+          <span class="grid size-[76px] place-items-center rounded-full bg-violet-50 text-violet-600 [&_.broadcast-icon]:size-11">${icon('qr')}</span>
+          <div><h3 class="text-[28px] font-black text-violet-600">LoopCode</h3><p class="text-lg font-semibold">Your unique participation code.</p><div class="mt-4 flex gap-3"><code class="flex-1 rounded-lg border-2 border-violet-300 px-5 py-3 text-center text-2xl font-black tracking-[.3em] text-violet-700">JOYCE-7249</code><button class="rounded-lg bg-violet-600 px-6 font-black text-white">Copy</button></div></div>
+        </article>
+        <div class="mt-5 flex items-center gap-4 rounded-2xl bg-slate-50 px-5 py-4 text-base font-bold text-[#13265f]">${icon('shield')}<span>When someone joins using your <b class="text-blue-600">LoopLink</b> or <b class="text-violet-600">LoopCode</b>, they’re connected to your <b class="text-cyan-600">Loop Activity.</b></span></div>
+      </section>
+      <aside class="rounded-[28px] border border-sky-200/80 bg-white/95 p-6 shadow-2xl">
+        <h3 class="flex items-center gap-3 border-b pb-5 text-lg font-black"><i class="size-3 rounded-full bg-cyan-500"></i>LIVE LOOP ACTIVITY</h3>
+        <div class="flex items-center gap-4 border-b py-5"><span class="grid size-14 place-items-center rounded-full bg-cyan-50 text-cyan-500 [&_.broadcast-icon]:size-8">${icon('people')}</span><b class="text-5xl text-cyan-500">12</b><span class="font-semibold">joined through<br/>your tools</span></div>
+        ${activity.map(([letter, name, action, time], index) => `<article class="flex items-center gap-3 border-b py-4"><b class="grid size-9 place-items-center rounded-full ${index === 1 ? 'bg-violet-100 text-violet-600' : 'bg-sky-100 text-sky-600'}">${letter}</b><span class="min-w-0 flex-1"><strong class="block">${name}</strong><small>${action}</small></span><small>${time}</small></article>`).join('')}
+        <p class="pt-5 text-center font-black text-cyan-600">+9 more in the last hour</p>
+      </aside>
+    </div>`
+    return renderTailwindUnderlay({ title: 'LOOPLINK &<br/>LOOPCODE ACTIVATION', subtitle: config.subtitle, body })
   },
-  renderForeground() { return renderLayeredForeground('21', config) },
+  renderForeground() { return renderTailwindForeground(['↗ LoopLink', '▦ LoopCode', '◇ Share Responsibly', '▥ Loop Activity']) },
 }

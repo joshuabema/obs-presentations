@@ -1,3 +1,5 @@
+import { featureCards, renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+
 // Scene 35 owns these design primitives so it can be edited independently.
 const ICONS = {
   people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c.4-4 2.3-6 6-6s5.6 2 6 6M14 14c3.8-.7 6.1 1 6.5 4.5"/></svg>',
@@ -154,6 +156,6 @@ const config = {
   }
 export const scene35 = {
   presenterZone: 'left',
-  renderUnderlay() { return renderLayeredUnderlay('35', config, renderFeatureCards('35', config)) },
-  renderForeground() { return renderLayeredForeground('35', config) },
+  renderUnderlay() { return renderTailwindUnderlay({ title: config.title, subtitle: config.subtitle, body: featureCards(config.items, 4) }) },
+  renderForeground() { return renderTailwindForeground(['♡ Thank You', '▶ Next Steps', '▦ Explore Your Dashboard', '◌ Stay Connected']) },
 }

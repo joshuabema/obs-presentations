@@ -1,3 +1,5 @@
+import { ctaBoard, renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+
 // Scene 34 owns these design primitives so it can be edited independently.
 const ICONS = {
   people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c.4-4 2.3-6 6-6s5.6 2 6 6M14 14c3.8-.7 6.1 1 6.5 4.5"/></svg>',
@@ -155,8 +157,7 @@ const config = {
 export const scene34 = {
   presenterZone: 'left',
   renderUnderlay() {
-    const body = `<div class="reference-cta-layout h-full"><aside>${renderQrCard('Scan to Join Now')}</aside><section class="rounded-panel border border-sky-200/70 bg-white/95 shadow-card"><small>ENROLLMENT IS OPEN</small><h3>Choose how you want to participate.</h3><div class="cta-option-grid">${config.items.map((item) => `<article class="rounded-2xl border border-sky-200/70 bg-white shadow-sm" data-control-cue="${item.cue}"><span>${icon(item.icon)}</span><div><h4>${item.title}</h4><p>${item.copy}</p></div><button>${item.value}</button></article>`).join('')}</div><footer><span>Secure enrollment</span><span>Instant access</span><span>Community support</span></footer></section></div>`
-    return renderLayeredUnderlay('34', config, body)
+    return renderTailwindUnderlay({ title: 'FINAL ENROLLMENT<br/>CALL TO ACTION', subtitle: config.subtitle, body: ctaBoard(config.items) })
   },
-  renderForeground() { return renderLayeredForeground('34', config) },
+  renderForeground() { return renderTailwindForeground(['⚑ Final Enrollment', '▦ Scan to Join', '♙ Choose Access Level', '♧ Join as a Builder']) },
 }

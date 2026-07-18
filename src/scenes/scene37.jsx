@@ -1,3 +1,5 @@
+import { metricBoard, renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+
 // Scene 37 owns these design primitives so it can be edited independently.
 const ICONS = {
   people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c.4-4 2.3-6 6-6s5.6 2 6 6M14 14c3.8-.7 6.1 1 6.5 4.5"/></svg>',
@@ -157,8 +159,7 @@ const config = {
 export const scene37 = {
   presenterZone: 'left',
   renderUnderlay() {
-    const body = `<div class="enrollment-progress-layout h-full"><section class="rounded-panel border border-sky-200/70 bg-white/95 shadow-card"><div class="live-metric-grid">${config.items.slice(0, 4).map((item) => `<article>${icon(item.icon)}<strong>${item.value}</strong><span>${item.title}</span><small>${item.copy}</small></article>`).join('')}</div><div class="overall-progress"><header><div><small>OVERALL PROGRESS</small><h3>Enrollment movement</h3></div><strong>68%</strong></header><div><span></span></div><footer><span>0</span><span>Today’s goal: 350</span></footer></div><div class="live-feed"><header><span>● LIVE ACTIVITY</span><strong>JUST NOW</strong></header>${['Amina joined as a Builder', 'Samuel activated LoopLink', 'Joyce chose VIP Access'].map((copy, index) => `<article><b>${['A', 'S', 'J'][index]}</b><span>${copy}<small>${index + 1} min ago</small></span><i>✓</i></article>`).join('')}</div></section>${renderQrCard('Scan to enroll')}</div>`
-    return renderLayeredUnderlay('37', config, body)
+    return renderTailwindUnderlay({ title: 'ENROLLMENT<br/><span class="text-violet-600">PROGRESS LIVE</span>', subtitle: config.subtitle, body: metricBoard(config.items) })
   },
-  renderForeground() { return renderLayeredForeground('37', config) },
+  renderForeground() { return renderTailwindForeground(['⌁ YOU ARE WATCHING LIVE', '◌ LIVE CHAT ACTIVE', '♡ LIKE', '↗ SHARE', '♟ SUBSCRIBE']) },
 }

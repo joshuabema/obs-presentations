@@ -1,3 +1,5 @@
+import { renderTailwindCanvas, renderTailwindForeground } from './tailwindBroadcastScene.jsx'
+
 // Scene 24 owns these design primitives so it can be edited independently.
 const ICONS = {
   people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c.4-4 2.3-6 6-6s5.6 2 6 6M14 14c3.8-.7 6.1 1 6.5 4.5"/></svg>',
@@ -154,8 +156,26 @@ const config = {
 export const scene24 = {
   presenterZone: 'left',
   renderUnderlay() {
-    const body = `<div class="impact-explainer h-full"><section class="rounded-panel border border-sky-200/70 bg-white/90 text-bema-navy shadow-card backdrop-blur"><small>RECOGNIZED</small><strong>IMPACT</strong><span>EXPLAINED</span><div class="impact-orbit">${icon('heart')}<i></i><i></i></div><p>Acknowledging real value<br />created through verified movement.</p></section><div class="impact-points">${config.items.map((item) => `<article class="rounded-2xl border border-sky-200/70 bg-white/95 shadow-card" data-control-cue="${item.cue}"><strong>${item.value}</strong><span>${icon(item.icon)}</span><div><h3>${item.title}</h3><p>${item.copy}</p></div></article>`).join('')}</div></div>`
-    return renderLayeredUnderlay('24', config, body)
+    const cards = config.items.map((item, index) => {
+      const tones = [
+        ['border-cyan-400', 'bg-cyan-50', 'text-cyan-600'],
+        ['border-blue-500', 'bg-blue-50', 'text-blue-600'],
+        ['border-violet-500', 'bg-violet-50', 'text-violet-600'],
+      ]
+      const [border, background, text] = tones[index]
+      return `<article class="grid min-h-[228px] grid-cols-[74px_94px_1fr] items-center gap-5 rounded-[24px] border border-sky-200/80 border-l-[6px] ${border} bg-white/95 p-6 shadow-xl" data-control-cue="${item.cue}">
+        <strong class="grid size-[62px] place-items-center rounded-full ${text} ${background} text-2xl font-black">${item.value}</strong>
+        <span class="grid size-[86px] place-items-center rounded-full ${background} ${text} [&_.broadcast-icon]:size-12">${icon(item.icon)}</span>
+        <div><h3 class="text-[25px] font-black ${text}">${item.title}</h3><p class="mt-2 text-[17px] font-semibold leading-relaxed text-[#12235d]">${item.copy}</p></div>
+      </article>`
+    }).join('')
+    const body = `<section class="absolute left-[34%] top-[135px] z-20 w-[25%] text-center">
+        <h2 class="font-display text-[58px] font-black leading-[1.08] tracking-[-.045em] text-[#071b59]">RECOGNIZED<br/>IMPACT<br/>EXPLAINED</h2>
+        <div class="mx-auto mt-6 flex w-[310px] items-center gap-4 text-cyan-500"><span class="h-0.5 flex-1 bg-cyan-500"></span><span class="text-2xl">♥</span><span class="h-0.5 flex-1 bg-cyan-500"></span></div>
+        <p class="mt-5 text-[22px] font-semibold leading-relaxed text-[#16255c]">Acknowledging real value<br/>created through verified movement.</p>
+      </section>
+      <section class="absolute right-12 top-[104px] z-20 grid w-[39%] gap-4">${cards}</section>`
+    return renderTailwindCanvas(body)
   },
-  renderForeground() { return renderLayeredForeground('24', config) },
+  renderForeground() { return renderTailwindForeground(['♡ Recognized Impact', '◇ Verification', '↗ Qualifying LoopLocks']) },
 }

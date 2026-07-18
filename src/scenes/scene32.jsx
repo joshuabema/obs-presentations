@@ -1,3 +1,5 @@
+import { renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+
 // Scene 32 owns these design primitives so it can be edited independently.
 const ICONS = {
   people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c.4-4 2.3-6 6-6s5.6 2 6 6M14 14c3.8-.7 6.1 1 6.5 4.5"/></svg>',
@@ -157,19 +159,21 @@ const config = {
 export const scene32 = {
   presenterZone: "left",
   renderUnderlay() {
-    const bars = [35, 48, 42, 67, 58, 81, 94];
-    const body = `<div class="leaderboard-layout h-full"><section class="rounded-panel border border-sky-200/70 bg-white/95 shadow-card"><header><div><small>TOP REFERRERS</small><h3>Community leaders</h3></div><strong>LOOPLOCKS</strong></header>${config.items
-      .slice(0, 5)
-      .map(
-        (item, index) =>
-          `<article data-control-cue="${item.cue}"><b class="rank">${index + 1}</b><span class="leader-avatar">${item.title.slice(0, 2).toUpperCase()}</span><div><h4>${item.title}</h4><p>${item.copy}</p></div><strong>${item.value}</strong><i>${index < 2 ? "↑" : "—"}</i></article>`,
-      )
-      .join(
-        "",
-      )}</section><aside class="rounded-panel border border-sky-200/70 bg-white/95 shadow-card"><small>WEEKLY MOMENTUM</small><strong>+24%</strong><p>Community movement this week</p><div class="momentum-chart">${bars.map((value) => `<i style="height:${value}%"></i>`).join("")}</div><dl><div><dt>1,248</dt><dd>Referrals</dd></div><div><dt>2,976</dt><dd>LoopLinks</dd></div><div><dt>4,532</dt><dd>Actions</dd></div></dl></aside></div>`;
-    return renderLayeredUnderlay("32", config, body);
+    const leaders = [
+      { ...config.items[0], image: '/assets/generated/changemaker-jordan.png' },
+      { ...config.items[1], image: '/assets/generated/changemaker-amina.png' },
+      { ...config.items[2], image: '/assets/generated/changemaker-marcus.png' },
+      { ...config.items[3], image: '/assets/generated/changemaker-tierra.png' },
+      { ...config.items[4], image: '/assets/generated/changemaker-darnell.png' },
+    ]
+    const momentum = [['♙', 'New Referrals', '1,248', '▲ 18%'], ['↗', 'LoopLinks Shared', '2,976', '▲ 24%'], ['♡', 'Community Actions', '4,532', '▲ 21%']]
+    const body = `<div class="grid h-full grid-cols-[1.35fr_.85fr] content-center gap-5">
+      <section class="overflow-hidden rounded-[26px] border border-sky-200 bg-white/95 p-6 shadow-2xl"><header class="flex items-center gap-4 border-b pb-4"><span class="grid size-14 place-items-center rounded-full bg-blue-50 text-3xl text-blue-600">♜</span><h3 class="text-[25px] font-black">TOP BUILDERS THIS WEEK</h3></header><div>${leaders.map((item, index) => `<article class="grid grid-cols-[54px_78px_1fr_100px] items-center gap-4 border-b py-3" data-control-cue="${item.cue}"><b class="grid size-10 place-items-center rounded-full ${index === 0 ? 'bg-amber-300 text-amber-950' : index === 1 ? 'bg-slate-200' : index === 2 ? 'bg-orange-200' : 'bg-blue-50 text-blue-600'} text-lg">${index + 1}</b><img class="size-[68px] rounded-full border-2 border-white object-cover shadow-md" src="${item.image}" alt="${item.title}"/><div><h4 class="text-[22px] font-black">${item.title}</h4><p class="text-[15px] font-semibold text-slate-600">${item.copy}</p></div><strong class="text-right text-[28px] font-black text-cyan-600">${item.value}<small class="block text-xs text-[#14255d]">Referrals</small></strong></article>`).join('')}</div><p class="pt-4 text-center text-base font-black text-blue-700">♙　Thank you to all builders helping the community grow!</p></section>
+      <aside class="grid grid-rows-[1.2fr_.8fr] gap-5"><section class="rounded-[26px] border border-sky-200 bg-white/95 p-6 shadow-2xl"><header class="flex items-center gap-4 border-b pb-4"><span class="grid size-14 place-items-center rounded-full bg-cyan-50 text-3xl text-cyan-600">↗</span><h3 class="text-[24px] font-black">WEEKLY MOMENTUM</h3></header>${momentum.map(([symbol,label,value,change], index) => `<div class="grid grid-cols-[50px_1fr_auto] items-center gap-4 border-b py-4"><span class="text-[34px] ${index === 2 ? 'text-fuchsia-500' : 'text-blue-600'}">${symbol}</span><div><small class="text-[15px] font-bold">${label}</small><strong class="block text-[28px] font-black text-cyan-600">${value}</strong></div><b class="text-sm text-cyan-600">${change}<small class="block text-[10px] text-slate-500">vs last week</small></b></div>`).join('')}</section><section class="rounded-[26px] border border-sky-200 bg-white/95 p-5 shadow-2xl"><h3 class="flex items-center gap-3 border-b pb-3 text-[22px] font-black"><i class="size-3 rounded-full bg-violet-600"></i>LIVE ACTIVITY</h3>${leaders.slice(0, 3).map((item, index) => `<div class="mt-3 flex items-center gap-3"><img class="size-11 rounded-full object-cover" src="${item.image}" alt=""/><strong class="min-w-0 flex-1 truncate">@${item.title.replaceAll(' ','')} ${index === 0 ? 'shared a LoopLink' : index === 1 ? 'joined Bema Hub' : 'invited 3 friends'}</strong><small>${10 + index * 18}s ago</small></div>`).join('')}</section></aside>
+    </div>`
+    return renderTailwindUnderlay({ title: 'TOP REFERRERS &<br/>COMMUNITY MOMENTUM', subtitle: config.subtitle, body, titleClass: '[&_h2]:!text-[64px]' });
   },
   renderForeground() {
-    return renderLayeredForeground("32", config);
+    return renderTailwindForeground(['♜ Top Referrers', '♙ Community Momentum', '↗ Loop Activity', '▥ Weekly Movement']);
   },
 };

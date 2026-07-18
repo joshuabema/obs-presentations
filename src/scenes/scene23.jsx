@@ -1,3 +1,5 @@
+import { renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+
 // Scene 23 owns these design primitives so it can be edited independently.
 const ICONS = {
   people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c.4-4 2.3-6 6-6s5.6 2 6 6M14 14c3.8-.7 6.1 1 6.5 4.5"/></svg>',
@@ -158,6 +160,24 @@ const config = {
   }
 export const scene23 = {
   presenterZone: 'left',
-  renderUnderlay() { return renderLayeredUnderlay('23', config, renderStatus('23', config)) },
-  renderForeground() { return renderLayeredForeground('23', config) },
+  renderUnderlay() {
+    const symbols = ['◷', '◇', '★', '×']
+    const tones = [
+      ['border-amber-300', 'bg-amber-50', 'text-amber-600'],
+      ['border-blue-300', 'bg-blue-50', 'text-blue-600'],
+      ['border-teal-400', 'bg-teal-50', 'text-teal-600'],
+      ['border-violet-300', 'bg-violet-50', 'text-violet-600'],
+    ]
+    const cards = `<section class="grid h-[440px] grid-rows-[1fr_58px] gap-4 rounded-[28px] border border-sky-200/80 bg-white/95 p-5 shadow-2xl"><div class="grid grid-cols-4 gap-5">${config.items.map((item, index) => {
+      const [border, background, text] = tones[index]
+      return `<article class="flex min-w-0 flex-col items-center rounded-[20px] border ${border} bg-white px-5 py-5 text-center shadow-md ${index === 2 ? 'ring-2 ring-teal-400 ring-offset-4' : ''}" data-control-cue="${item.cue}">
+        <span class="grid size-[72px] place-items-center rounded-full ${background} text-[34px] font-black ${text}">${symbols[index]}</span>
+        <h3 class="mt-4 text-[20px] font-black leading-tight ${text}">${item.title}</h3>
+        <p class="mt-3 flex-1 text-[15px] font-semibold leading-relaxed text-[#17265c]">${item.copy}</p>
+        <strong class="mt-4 w-full rounded-xl ${background} px-3 py-3 text-[13px] font-black ${text}">${item.value}</strong>
+      </article>`
+    }).join('')}</div><div class="flex items-center justify-center rounded-xl bg-blue-50 px-5 text-center text-[16px] font-bold text-[#17265c]">ⓘ　Only <b class="mx-1 text-teal-600">Qualified LoopLocks</b> may contribute to <b class="mx-1 text-violet-600">Recognized Impact</b> according to campaign rules.</div></section>`
+    return renderTailwindUnderlay({ title: 'QUALIFIED LOOPLOCKS', subtitle: config.subtitle, body: cards })
+  },
+  renderForeground() { return renderTailwindForeground(['◇ Qualified LoopLocks', '⌕ Verification', '▤ Campaign Rules']) },
 }

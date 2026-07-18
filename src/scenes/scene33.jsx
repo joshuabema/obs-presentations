@@ -1,3 +1,5 @@
+import { faqRows, renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+
 // Scene 33 owns these design primitives so it can be edited independently.
 const ICONS = {
   people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c.4-4 2.3-6 6-6s5.6 2 6 6M14 14c3.8-.7 6.1 1 6.5 4.5"/></svg>',
@@ -156,8 +158,7 @@ const config = {
 export const scene33 = {
   presenterZone: 'left',
   renderUnderlay() {
-    const body = `<div class="faq-layout h-full"><section class="rounded-panel border border-sky-200/70 bg-white/90 text-bema-navy shadow-card backdrop-blur"><span class="faq-mark">?</span><h3>Everything you need to know.</h3><p>Clear answers before you choose your next step.</p><button>VISIT HELP CENTER</button></section><div class="faq-list">${config.items.map((item, index) => `<article class="rounded-2xl border border-sky-200/70 bg-white/95 shadow-card" data-control-cue="${item.cue}"><span>${String(index + 1).padStart(2, '0')}</span><div><h3>${item.title}</h3><p>${item.copy}</p></div><b>+</b></article>`).join('')}</div></div>`
-    return renderLayeredUnderlay('33', config, body)
+    return renderTailwindUnderlay({ title: 'FREQUENTLY ASKED<br/>QUESTIONS', subtitle: config.subtitle, body: faqRows(config.items) })
   },
-  renderForeground() { return renderLayeredForeground('33', config) },
+  renderForeground() { return renderTailwindForeground(['? FAQ', '◌ Clear Answers', '♙ Participation Questions', '◇ Join with Confidence']) },
 }
