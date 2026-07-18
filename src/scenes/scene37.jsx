@@ -1,4 +1,4 @@
-import { metricBoard, renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+import { renderTailwindCanvas, renderTailwindForeground } from './tailwindBroadcastScene.jsx'
 
 // Scene 37 owns these design primitives so it can be edited independently.
 const ICONS = {
@@ -159,7 +159,41 @@ const config = {
 export const scene37 = {
   presenterZone: 'left',
   renderUnderlay() {
-    return renderTailwindUnderlay({ title: 'ENROLLMENT<br/><span class="text-violet-600">PROGRESS LIVE</span>', subtitle: config.subtitle, body: metricBoard(config.items) })
+    const metrics = [
+      ['⌗', 'Scans', '248', 'bg-cyan-50', 'text-cyan-600', 'border-cyan-200'],
+      ['♙', 'New Builders', '76', 'bg-sky-50', 'text-sky-600', 'border-sky-200'],
+      ['↗', 'LoopLinks Activated', '119', 'bg-violet-50', 'text-violet-600', 'border-violet-200'],
+      ['?', 'Questions Answered', '32', 'bg-purple-50', 'text-purple-600', 'border-purple-200'],
+    ]
+    const activity = [
+      ['Amina', 'joined through LoopCode', 'bg-cyan-500'],
+      ['Samuel', 'activated LoopLink', 'bg-blue-500'],
+      ['Joyce', 'chose VIP Access', 'bg-violet-500'],
+    ]
+    return renderTailwindCanvas(`
+      <div class="absolute inset-y-0 left-0 w-[27%] border-r border-white/30 bg-white/10" aria-label="Large presenter profile placement"></div>
+      <header class="absolute left-[26%] top-[145px] z-20 w-[27%] px-7 text-left">
+        <h2 class="font-display text-[64px] font-black leading-[.9] tracking-[-.05em] text-[#071b59]">ENROLLMENT<br/>PROGRESS<br/><span class="bg-gradient-to-r from-cyan-500 via-blue-600 to-violet-600 bg-clip-text text-[82px] text-transparent">LIVE</span> <span class="text-[55px] text-violet-600">◉</span></h2>
+        <div class="mt-6 h-1 w-28 rounded-full bg-cyan-500"></div>
+        <p class="mt-5 text-[27px] font-bold leading-tight text-[#16255c]">Real-time movement as<br/>viewers take action.</p>
+      </header>
+      <section class="absolute bottom-[130px] left-[53%] right-10 top-[92px] z-20 grid grid-cols-[240px_1fr] overflow-hidden rounded-[30px] border border-sky-200 bg-white/90 shadow-2xl backdrop-blur">
+        <aside class="border-r border-indigo-200 p-5">
+          <h3 class="text-center text-[22px] font-black">SCAN TO JOIN NOW</h3>
+          <div class="mt-4 rounded-[20px] border-4 border-blue-500 bg-white p-3 shadow-lg"><img class="w-full" src="/assets/qr/main-join-qr.png" alt="Scan to join Bema Hub" /></div>
+          <h3 class="mt-6 text-[21px] font-black">LIVE ACTIVITY FEED</h3>
+          <div class="mt-3 space-y-3">
+            ${activity.map(([name, action, color]) => `<article class="grid grid-cols-[46px_1fr_auto] items-center gap-3 rounded-xl border border-sky-200 bg-white p-3 shadow-sm"><span class="grid size-11 place-items-center rounded-full ${color} text-xl font-black text-white">♙</span><p class="text-[14px] font-bold leading-tight"><b class="text-blue-600">${name}</b> ${action}</p><small class="font-bold text-slate-500">Now</small></article>`).join('')}
+          </div>
+        </aside>
+        <main class="p-6">
+          <h3 class="text-[23px] font-black">OVERALL ENROLLMENT PROGRESS</h3>
+          <div class="mt-5 flex items-center gap-5"><div class="h-7 flex-1 overflow-hidden rounded-full bg-slate-200"><span class="block h-full w-[68%] rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-600"></span></div><strong class="text-[42px] font-black text-violet-600">68%</strong></div>
+          <div class="mt-7 grid grid-cols-2 gap-5">
+            ${metrics.map(([symbol, label, value, tint, text, border]) => `<article class="flex min-h-[175px] items-center gap-5 rounded-[22px] border-2 ${border} bg-white px-5 shadow-lg"><span class="grid size-[76px] shrink-0 place-items-center rounded-full ${tint} text-[34px] font-black ${text}">${symbol}</span><div><h4 class="text-[20px] font-black leading-tight">${label}</h4><strong class="mt-2 block text-[40px] font-black leading-none ${text}">${value}</strong></div></article>`).join('')}
+          </div>
+        </main>
+      </section>`)
   },
   renderForeground() { return renderTailwindForeground(['⌁ YOU ARE WATCHING LIVE', '◌ LIVE CHAT ACTIVE', '♡ LIKE', '↗ SHARE', '♟ SUBSCRIBE']) },
 }

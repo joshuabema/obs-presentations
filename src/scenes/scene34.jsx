@@ -1,4 +1,4 @@
-import { ctaBoard, renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+import { renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
 
 // Scene 34 owns these design primitives so it can be edited independently.
 const ICONS = {
@@ -157,7 +157,41 @@ const config = {
 export const scene34 = {
   presenterZone: 'left',
   renderUnderlay() {
-    return renderTailwindUnderlay({ title: 'FINAL ENROLLMENT<br/>CALL TO ACTION', subtitle: config.subtitle, body: ctaBoard(config.items) })
+    const accessCards = [
+      ['♙', 'PARTICIPATION LEVEL', 'Entry point into the campaign experience.', 'Join Now', 'border-cyan-300', 'bg-cyan-50', 'text-cyan-600', 'border-cyan-400'],
+      ['☆', 'VIP ACCESS', 'Deeper creator assets and a more connected experience.', 'Upgrade Now', 'border-violet-300', 'bg-violet-50', 'text-violet-600', 'border-violet-400'],
+      ['♛', 'SIGNATURE VIP', 'Deepest access, exclusive assets, and identity-based participation.', 'Go All In', 'border-amber-300', 'bg-amber-50', 'text-amber-600', 'border-amber-400'],
+    ]
+    const body = `
+      <section class="mx-auto grid h-[570px] w-full grid-cols-[280px_1fr] gap-5">
+        <aside class="flex flex-col items-center justify-center rounded-[28px] border-2 border-cyan-300 bg-white/95 px-5 py-5 text-center shadow-2xl">
+          <h3 class="text-[26px] font-black tracking-tight">SCAN TO JOIN</h3>
+          <div class="mt-4 rounded-[22px] border-4 border-blue-500 bg-white p-3 shadow-[0_12px_28px_rgba(37,99,235,.22)]">
+            <img class="size-[190px]" src="/assets/qr/main-join-qr.png" alt="Scan to join Bema Hub" />
+          </div>
+          <p class="mt-4 text-[20px] font-black italic leading-tight text-cyan-600">Scan now<br/>to get started!</p>
+        </aside>
+        <div class="grid min-w-0 grid-cols-3 grid-rows-[1fr_112px] gap-4">
+          ${accessCards.map(([symbol, title, copy, action, border, tint, text, rule]) => `
+            <article class="flex min-w-0 flex-col items-center rounded-[26px] border-2 ${border} bg-white/95 px-5 py-6 text-center shadow-xl">
+              <span class="grid size-[82px] place-items-center rounded-full ${tint} text-[45px] font-black leading-none ${text}">${symbol}</span>
+              <h3 class="mt-5 text-[24px] font-black leading-[1.05] ${text}">${title}</h3>
+              <p class="mt-4 text-[17px] font-semibold leading-[1.35] text-slate-700">${copy}</p>
+              <strong class="mt-auto border-t-2 ${rule} pt-4 text-[19px] font-black ${text}">${action}</strong>
+            </article>`).join('')}
+          <article class="col-span-3 grid grid-cols-[1fr_1px_1fr] items-center rounded-[24px] border border-sky-200 bg-white/95 px-7 shadow-xl">
+            <div class="flex items-center gap-5"><span class="grid size-16 place-items-center rounded-full bg-violet-100 text-3xl text-violet-700">♙</span><div><h3 class="text-[23px] font-black text-violet-700">JOIN AS A BUILDER</h3><p class="text-[16px] font-semibold text-slate-700">Create value. Help more people.</p></div></div>
+            <span class="h-16 bg-indigo-300"></span>
+            <div class="flex items-center gap-5 pl-7"><span class="grid size-16 place-items-center rounded-full bg-blue-100 text-3xl text-blue-600">•••</span><div><h3 class="text-[23px] font-black text-blue-700">CHAT WITH US LIVE</h3><p class="text-[16px] font-semibold text-slate-700">Have a question? We’re here to help.</p></div></div>
+          </article>
+        </div>
+      </section>`
+    return renderTailwindUnderlay({
+      title: 'FINAL ENROLLMENT<br/><span class="bg-gradient-to-r from-blue-700 to-violet-700 bg-clip-text text-transparent">CALL TO ACTION</span>',
+      subtitle: config.subtitle,
+      body,
+      titleClass: '[&_h2]:!text-[64px] [&_p]:!text-[23px]'
+    })
   },
   renderForeground() { return renderTailwindForeground(['⚑ Final Enrollment', '▦ Scan to Join', '♙ Choose Access Level', '♧ Join as a Builder']) },
 }

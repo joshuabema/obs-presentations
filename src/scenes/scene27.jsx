@@ -1,4 +1,4 @@
-import { renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+import { renderTailwindCanvas, renderTailwindForeground } from './tailwindBroadcastScene.jsx'
 
 // Scene 27 owns these design primitives so it can be edited independently.
 const ICONS = {
@@ -158,8 +158,40 @@ const config = {
 export const scene27 = {
   presenterZone: 'left',
   renderUnderlay() {
-    const body = `<section class="h-full overflow-hidden rounded-[28px] border border-sky-200 bg-white/95 p-5 shadow-2xl"><small class="font-bold text-blue-600">‹ Events　›　Creative Futures Summit 2026</small><header class="mt-3 grid h-[210px] grid-cols-[1fr_320px] overflow-hidden rounded-2xl bg-[linear-gradient(90deg,rgba(3,15,55,.96)_0%,rgba(3,15,55,.82)_45%,rgba(20,15,80,.28)_100%),url('/assets/generated/scene27-event-hero.png')] bg-cover bg-center p-7 text-white"><div><b class="rounded bg-violet-500 px-3 py-1 text-xs">LIVE EVENT</b><h3 class="mt-4 text-4xl font-black leading-tight">Creative Futures<br/>Summit 2026</h3><p class="mt-2 text-lg">Inspire. Create. Impact.</p></div><div class="grid content-center gap-5 text-base font-bold drop-shadow-lg"><span>▣ May 28, 2026</span><span>◷ 10:00 AM – 3:30 PM ET</span><span>⌖ Bema Hub Virtual Stage</span></div></header><div class="mt-3 grid h-[62px] grid-cols-[1fr_1.4fr] items-center rounded-xl border border-slate-200 bg-white px-5 shadow-sm"><div class="flex items-center gap-3"><img class="size-10" src="/assets/logos/bemahub-reference-mark.svg" alt=""/><span><small class="block text-slate-500">Hosted by</small><strong>Bema Hub</strong></span></div><div class="flex items-center gap-3 border-l pl-6"><span><small class="block text-slate-500">Presented by</small><strong>Community creators</strong></span><div class="ml-auto flex -space-x-3">${['amina','jordan','tierra','marcus'].map((name) => `<img class="size-9 rounded-full border-2 border-white object-cover" src="/assets/generated/changemaker-${name}.png" alt=""/>`).join('')}<b class="grid size-9 place-items-center rounded-full border-2 border-white bg-blue-50 text-xs text-blue-600">+5</b></div></div></div><div class="mt-3 grid grid-cols-[1fr_1.2fr_260px] gap-4"><article class="rounded-xl border p-4"><h4 class="text-lg font-black">Summary</h4><p class="mt-3 text-sm font-semibold leading-relaxed text-slate-600">A half-day experience for creators, builders, and changemakers exploring creativity, community, and impact.</p></article><article class="rounded-xl border p-4"><h4 class="text-lg font-black">Schedule</h4>${['10:00 AM　Opening Keynote', '11:15 AM　Builders in Action', '1:00 PM　From Idea to Impact', '3:00 PM　Closing Reflections'].map((row) => `<p class="border-b py-2 text-sm font-bold">${row}</p>`).join('')}</article><aside class="grid content-start gap-2"><button class="rounded-lg bg-violet-600 px-5 py-3 text-lg font-black text-white">Register or Join　→</button><p class="text-center text-sm font-semibold">It’s free and open to all.</p><div class="rounded-xl border p-4"><h4 class="font-black">What Attendees Get</h4><p class="mt-2 text-sm leading-6">▶ Live expert sessions<br/>▤ Practical resources<br/>♙ Networking opportunities<br/>☁ Recording access</p></div></aside></div></section>`
-    return renderTailwindUnderlay({ title: 'EVENT DETAIL<br/>PAGE', subtitle: config.subtitle, body })
+    const schedule = [
+      ['10:00 AM', 'Opening Keynote'],
+      ['11:15 AM', 'Builders in Action'],
+      ['1:00 PM', 'From Idea to Impact'],
+      ['3:00 PM', 'Closing Reflections'],
+    ]
+    const benefits = [
+      ['▶', 'Live expert sessions', 'bg-violet-100 text-violet-700'],
+      ['▤', 'Practical resources', 'bg-cyan-100 text-cyan-700'],
+      ['♙', 'Networking opportunities', 'bg-blue-100 text-blue-700'],
+      ['☁', 'Recording access', 'bg-amber-100 text-amber-700'],
+    ]
+    return renderTailwindCanvas(`
+      <div class="absolute inset-y-0 left-0 w-[30%] border-r border-white/30 bg-white/10" aria-label="Large presenter profile placement"></div>
+      <header class="absolute left-[29.5%] top-[155px] z-20 w-[19%] px-5 text-center">
+        <h2 class="font-display text-[60px] font-black leading-[.9] tracking-[-.05em] text-[#071b59]"><span class="bg-gradient-to-r from-blue-600 to-violet-700 bg-clip-text text-transparent">EVENT</span><br/>DETAIL PAGE</h2>
+        <div class="mx-auto mt-6 flex w-56 items-center gap-3 text-cyan-500"><span class="h-1 flex-1 bg-cyan-500"></span><span class="text-2xl">♥</span><span class="h-1 flex-1 bg-cyan-500"></span></div>
+        <p class="mt-6 text-[24px] font-bold leading-[1.3] text-[#16255c]">See the event story,<br/>schedule, and<br/>registration path.</p>
+      </header>
+      <section class="absolute bottom-[130px] left-[48.5%] right-10 top-[88px] z-20 overflow-hidden rounded-[30px] border border-sky-200 bg-white/95 p-4 shadow-2xl">
+        <p class="px-2 text-[14px] font-black text-blue-600">‹ Events　›　Creative Futures Summit 2026</p>
+        <header class="mt-3 grid h-[225px] grid-cols-[1fr_270px] overflow-hidden rounded-[22px] bg-[linear-gradient(90deg,rgba(3,15,55,.98)_0%,rgba(3,15,55,.84)_45%,rgba(20,15,80,.22)_100%),url('/assets/generated/scene27-event-hero.png')] bg-cover bg-center p-6 text-white">
+          <div><b class="rounded-md bg-violet-600 px-3 py-1 text-[13px]">LIVE EVENT</b><h3 class="mt-4 text-[34px] font-black leading-[1.05]">Creative Futures<br/>Summit 2026</h3><p class="mt-2 text-[18px] font-bold">Inspire. Create. Impact.</p></div>
+          <div class="grid content-center gap-5 text-[16px] font-black drop-shadow-lg"><span>▣　May 28, 2026</span><span>◷　10:00 AM – 3:30 PM ET</span><span>⌖　Bema Hub Virtual Stage</span></div>
+        </header>
+        <div class="mt-3 grid h-[76px] grid-cols-[.85fr_1.15fr] items-center rounded-[16px] border border-slate-200 bg-white px-5 shadow-sm">
+          <div class="flex items-center gap-3"><img class="size-12" src="/assets/logos/bemahub-reference-mark.svg" alt=""/><span><small class="block text-[13px] font-bold text-slate-500">Hosted by</small><strong class="text-[18px]">Bema Hub</strong></span></div>
+          <div class="flex items-center border-l pl-5"><span><small class="block text-[13px] font-bold text-slate-500">Presented by</small><strong class="text-[17px]">Community creators</strong></span><div class="ml-auto flex -space-x-3">${['amina','jordan','tierra','marcus'].map((name) => `<img class="size-12 rounded-full border-2 border-white object-cover shadow" src="/assets/generated/changemaker-${name}.png" alt=""/>`).join('')}<b class="grid size-12 place-items-center rounded-full border-2 border-white bg-blue-50 text-[13px] text-blue-600">+5</b></div></div>
+        </div>
+        <div class="mt-3 grid h-[310px] grid-cols-[1.05fr_.95fr] gap-4">
+          <article class="rounded-[18px] border border-sky-200 bg-white p-5 shadow-sm"><h4 class="text-[22px] font-black">Schedule</h4><div class="mt-2">${schedule.map(([time, label]) => `<div class="grid grid-cols-[92px_1fr] items-center border-b border-slate-200 py-3"><strong class="text-[15px] text-cyan-600">${time}</strong><span class="text-[16px] font-black">${label}</span></div>`).join('')}</div></article>
+          <aside class="grid grid-rows-[78px_1fr] gap-3"><button class="rounded-[16px] bg-gradient-to-r from-blue-600 to-violet-600 text-[22px] font-black text-white shadow-lg">Register or Join　→<small class="mt-1 block text-[13px]">Free and open to all</small></button><article class="rounded-[18px] border border-sky-200 bg-white p-5 shadow-sm"><h4 class="text-[22px] font-black">What Attendees Get</h4><ul class="mt-3 space-y-3">${benefits.map(([symbol, label, color]) => `<li class="flex items-center gap-3 text-[17px] font-black"><span class="grid size-9 place-items-center rounded-full ${color}">${symbol}</span>${label}</li>`).join('')}</ul></article></aside>
+        </div>
+      </section>`)
   },
   renderForeground() { return renderTailwindForeground(['▣ Event Detail', '◷ Schedule', '♙ Register Now', '⌁ Join Live']) },
 }

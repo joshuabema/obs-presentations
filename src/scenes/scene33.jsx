@@ -1,4 +1,4 @@
-import { faqRows, renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+import { renderTailwindCanvas, renderTailwindForeground } from './tailwindBroadcastScene.jsx'
 
 // Scene 33 owns these design primitives so it can be edited independently.
 const ICONS = {
@@ -158,7 +158,19 @@ const config = {
 export const scene33 = {
   presenterZone: 'left',
   renderUnderlay() {
-    return renderTailwindUnderlay({ title: 'FREQUENTLY ASKED<br/>QUESTIONS', subtitle: config.subtitle, body: faqRows(config.items) })
+    const questions = [
+      ['♙', '1. What are the access levels?', 'Access Levels determine what you receive, not your Recognized Impact rate.', 'border-cyan-200', 'bg-cyan-50', 'text-cyan-600'],
+      ['▣', '2. What do I receive at each level?', 'Each level unlocks creator assets, experiences, and exclusive participation opportunities.', 'border-violet-200', 'bg-violet-50', 'text-violet-600'],
+      ['↗', '3. What is LoopLink?', 'LoopLink is your personal sharing link that connects your activity and invites.', 'border-blue-200', 'bg-blue-50', 'text-blue-600'],
+      ['▢', '4. What are Qualified LoopLocks?', 'Verified participation triggers LoopLocks, which can contribute to Recognized Impact.', 'border-purple-200', 'bg-purple-50', 'text-purple-600'],
+      ['▥', '5. How is Recognized Impact measured?', 'Through qualified actions, participation history, and contributions to the community.', 'border-amber-200', 'bg-amber-50', 'text-amber-600'],
+    ]
+    return renderTailwindCanvas(`
+      <div class="absolute inset-y-0 left-0 w-[30%] border-r border-white/30 bg-white/10" aria-label="Large presenter profile placement"></div>
+      <header class="absolute left-[28.5%] top-[165px] z-20 w-[28%] px-6 text-center"><h2 class="font-display text-[64px] font-black leading-[.9] tracking-[-.05em] text-[#071b59]">FREQUENTLY<br/><span class="bg-gradient-to-r from-blue-700 to-violet-700 bg-clip-text text-transparent">ASKED</span><br/>QUESTIONS</h2><div class="mx-auto mt-6 flex w-[360px] items-center gap-4 text-cyan-500"><span class="h-1 flex-1 bg-cyan-500"></span><span class="text-2xl">♥</span><span class="h-1 flex-1 bg-cyan-500"></span></div><p class="mt-6 text-[27px] font-bold leading-[1.3]">Clear answers before you<br/>choose your next step.</p></header>
+      <section class="absolute bottom-[130px] left-[56.5%] right-10 top-[82px] z-20 grid grid-rows-5 gap-3">
+        ${questions.map(([symbol, title, copy, border, tint, text]) => `<article class="grid grid-cols-[92px_1fr_42px] items-center gap-5 rounded-[24px] border-2 ${border} bg-white/95 px-6 shadow-xl"><span class="grid size-[78px] place-items-center rounded-full ${tint} text-[36px] font-black ${text}">${symbol}</span><div><h3 class="text-[23px] font-black leading-tight ${text}">${title}</h3><p class="mt-2 text-[17px] font-bold leading-[1.35] text-[#16255c]">${copy}</p></div><b class="text-[34px] font-black">⌄</b></article>`).join('')}
+      </section>`)
   },
   renderForeground() { return renderTailwindForeground(['? FAQ', '◌ Clear Answers', '♙ Participation Questions', '◇ Join with Confidence']) },
 }

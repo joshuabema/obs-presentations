@@ -1,3 +1,5 @@
+import { renderTailwindCanvas } from './tailwindBroadcastScene.jsx'
+
 // Scene 18 owns these design primitives so it can be edited independently.
 const ICONS = {
   people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c.4-4 2.3-6 6-6s5.6 2 6 6M14 14c3.8-.7 6.1 1 6.5 4.5"/></svg>',
@@ -33,9 +35,9 @@ function renderLiveBadge() {
 
 function renderForegroundBar(items, lead = 'LIVE NOW', { audience = false, leadIcon = 'signal' } = {}) {
   return `
-    <div class="foreground-bar absolute inset-x-[42px] bottom-[18px] z-30 flex h-[86px] items-stretch overflow-hidden rounded-[22px] border border-white/15 bg-bema-deep-navy/95 font-sans text-white shadow-2xl backdrop-blur-xl">
+    <div class="foreground-bar absolute inset-x-[42px] bottom-[18px] z-30 flex h-[86px] !items-center overflow-hidden rounded-[22px] border border-white/15 bg-bema-deep-navy/95 font-sans text-white shadow-2xl backdrop-blur-xl">
       <div class="foreground-bar-lead m-3 flex min-w-[175px] items-center justify-center gap-3 rounded-full bg-gradient-to-r from-red-500 to-red-600 px-7 [&_.broadcast-icon]:size-7">${icon(leadIcon)}<strong class="text-base font-black tracking-wide">${lead}</strong></div>
-      ${items.map((item) => `<div class="foreground-bar-item flex min-w-0 flex-1 items-center justify-center gap-3 border-l border-white/10 px-5 text-center text-sm font-bold text-indigo-50 [&_.broadcast-icon]:size-6 [&_.broadcast-icon]:text-bema-cyan">${icon(item.icon)}<span>${item.label}</span></div>`).join('')}
+      ${items.map((item) => `<div class="foreground-bar-item flex min-w-0 !flex-1 !basis-0 items-center justify-center gap-3 border-l border-white/10 px-5 text-center text-sm font-bold text-indigo-50 [&_.broadcast-icon]:size-6 [&_.broadcast-icon]:text-bema-cyan">${icon(item.icon)}<span>${item.label}</span></div>`).join('')}
       ${audience ? `<div class="foreground-bar-audience flex min-w-[170px] items-center justify-center gap-2 border-l border-white/10 px-5 [&_.broadcast-icon]:size-6 [&_.broadcast-icon]:text-bema-cyan">${icon('people')}<strong class="text-xl">${audience}</strong><span class="text-[10px] leading-tight text-indigo-200">Watching<br>Live</span></div>` : ''}
     </div>
   `
@@ -162,8 +164,23 @@ const config = {
 export const scene18 = {
   presenterZone: 'left',
   renderUnderlay() {
-    const body = `<div class="scene18-detail-panel h-full rounded-panel border border-sky-200/70 bg-white/95 shadow-card"><section class="scene18-creator"><div class="scene18-creator-photo">JV</div><div><h3>New Single Launch: Echoes</h3><strong>✓ Jaylen Vibes</strong><span>Music Creator</span><p>♫ R&amp;B Artist　│　♙ 128K Community　│　⌖ Atlanta, GA</p></div></section><section class="scene18-purpose">${icon('target')}<div><h3>Campaign Purpose</h3><p>Support the launch of my new single “Echoes” and help me amplify real music to real listeners.</p></div></section><section class="scene18-info assets">${icon('gift')}<div><h3>Participation Assets</h3><ul><li>Early song preview</li><li>Exclusive behind-the-scenes</li><li>Personalized shoutout</li><li>Limited edition artwork</li><li>VIP listening session access</li></ul></div></section><section class="scene18-info proof">${icon('shield')}<div><h3>Creator Proof &amp; Updates</h3><ul><li>Verified creator account</li><li>Previous campaigns delivered</li><li>Regular updates &amp; transparency</li><li>Real engagement, real results</li></ul><strong>✓　100% Delivery Rate</strong></div></section><section class="scene18-info levels">${icon('crown')}<div><h3>Access Levels</h3><p>${icon('people')} Participation Level</p><p>${icon('star')} VIP Access</p><p>${icon('crown')} Signature VIP</p></div></section><footer><b>i</b>Review the purpose, assets, access levels, and creator proof to see the <strong>creative value</strong> before you join.</footer></div>`
-    return renderLayeredUnderlay('18', config, body)
+    const assets = ['Early song preview', 'Exclusive behind-the-scenes', 'Personalized shoutout', 'Limited edition artwork', 'VIP listening session access']
+    const proof = ['Verified creator account', 'Previous campaigns delivered', 'Regular updates & transparency', 'Real engagement, real results']
+    return renderTailwindCanvas(`
+      <div class="absolute inset-y-0 left-0 w-[31%] border-r border-white/30 bg-white/10" aria-label="Large presenter profile placement"></div>
+      <header class="absolute left-[32%] right-12 top-10 z-20 text-center"><h2 class="font-display text-[66px] font-black leading-none tracking-[-.045em] text-[#071b59]">CAMPAIGN <span class="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">DETAIL PAGE</span></h2><p class="mt-3 text-[25px] font-bold">Real creative value. Clear mutual exchange.</p><div class="mx-auto mt-4 flex w-[600px] items-center gap-4 text-cyan-500"><span class="h-1 flex-1 bg-cyan-500"></span><span class="text-2xl">♥</span><span class="h-1 flex-1 bg-cyan-500"></span></div></header>
+      <section class="absolute bottom-[126px] left-[32%] right-10 top-[185px] z-20 overflow-hidden rounded-[30px] border border-violet-200 bg-white/95 p-5 shadow-2xl">
+        <div class="grid h-[180px] grid-cols-[1.25fr_.75fr] gap-5">
+          <article class="grid grid-cols-[150px_1fr] items-center gap-5 rounded-[20px] border border-sky-200 bg-white p-4 shadow-lg"><img class="size-[142px] rounded-[18px] object-cover shadow-md" src="/assets/generated/changemaker-marcus.png" alt="Jaylen Vibes"/><div><h3 class="text-[29px] font-black leading-tight">New Single Launch: Echoes</h3><strong class="mt-2 block text-[20px] text-blue-600">✓ Jaylen Vibes</strong><p class="mt-2 text-[16px] font-bold text-slate-600">Music Creator · R&amp;B Artist</p><p class="mt-3 text-[15px] font-black">♙ 128K Community　⌖ Atlanta, GA</p></div></article>
+          <article class="flex items-center gap-5 rounded-[20px] border border-cyan-200 bg-cyan-50/50 p-5 shadow-lg"><span class="grid size-[78px] shrink-0 place-items-center rounded-full bg-cyan-100 text-[38px] text-cyan-600">◎</span><div><h3 class="text-[24px] font-black text-cyan-600">Campaign Purpose</h3><p class="mt-2 text-[17px] font-bold leading-[1.35]">Support the launch of “Echoes” and amplify real music to real listeners.</p></div></article>
+        </div>
+        <div class="mt-5 grid h-[390px] grid-cols-[1.05fr_1.05fr_.9fr] gap-5">
+          <article class="rounded-[20px] border border-violet-200 bg-white p-5 shadow-lg"><h3 class="text-[24px] font-black text-violet-600">▣　Participation Assets</h3><ul class="mt-4 space-y-4">${assets.map((item) => `<li class="flex gap-3 text-[17px] font-black leading-tight"><b class="text-violet-600">•</b>${item}</li>`).join('')}</ul></article>
+          <article class="rounded-[20px] border border-blue-200 bg-white p-5 shadow-lg"><h3 class="text-[24px] font-black text-blue-600">◇　Creator Proof &amp; Updates</h3><ul class="mt-4 space-y-4">${proof.map((item) => `<li class="flex gap-3 text-[17px] font-black leading-tight"><b class="text-blue-600">•</b>${item}</li>`).join('')}</ul><strong class="mt-5 block rounded-xl bg-emerald-50 px-4 py-3 text-[18px] text-emerald-700">✓　100% Delivery Rate</strong></article>
+          <article class="rounded-[20px] border border-amber-200 bg-white p-5 shadow-lg"><h3 class="text-[24px] font-black text-amber-600">♛　Access Levels</h3><div class="mt-5 space-y-5"><p class="rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-4 text-[17px] font-black text-cyan-700">♙　Participation Level</p><p class="rounded-xl border border-violet-200 bg-violet-50 px-4 py-4 text-[17px] font-black text-violet-700">☆　VIP Access</p><p class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 text-[17px] font-black text-amber-700">♛　Signature VIP</p></div></article>
+        </div>
+        <footer class="mt-5 flex h-[58px] items-center justify-center rounded-xl bg-blue-50 px-5 text-center text-[17px] font-bold">ⓘ　Review the purpose, assets, access levels, and creator proof to see the <strong class="mx-1 text-violet-600">creative value</strong> before you join.</footer>
+      </section>`)
   },
   renderForeground() { return renderLayeredForeground('18', config) },
 }

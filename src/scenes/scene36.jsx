@@ -1,4 +1,4 @@
-import { faqRows, renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+import { renderTailwindCanvas, renderTailwindForeground } from './tailwindBroadcastScene.jsx'
 
 // Scene 36 owns these design primitives so it can be edited independently.
 const ICONS = {
@@ -157,7 +157,33 @@ const config = {
 export const scene36 = {
   presenterZone: 'left',
   renderUnderlay() {
-    return renderTailwindUnderlay({ title: 'LIVE <span class="text-violet-600">Q&A</span>', subtitle: config.subtitle, body: faqRows(config.items) })
+    const questions = [
+      'How do Access Levels work?',
+      'What counts as a LoopLock?',
+      'Where do I see my Loop Activity?',
+      'How do I choose a campaign?',
+    ]
+    return renderTailwindCanvas(`
+      <div class="absolute inset-y-0 left-0 w-[30%] border-r border-white/30 bg-white/10" aria-label="Large presenter profile placement"></div>
+      <header class="absolute left-[29%] top-[190px] z-20 w-[29%] px-5 text-center">
+        <h2 class="font-display text-[78px] font-black leading-none tracking-[-.05em] text-[#071b59]"><span class="bg-gradient-to-r from-violet-600 to-blue-700 bg-clip-text text-transparent">LIVE</span> Q&amp;A</h2>
+        <div class="mx-auto mt-5 h-1 w-32 rounded-full bg-gradient-to-r from-cyan-400 to-violet-600"></div>
+        <p class="mt-6 text-[29px] font-bold leading-tight text-[#16255c]">Your questions<br/>are welcome.</p>
+      </header>
+      <section class="absolute bottom-[130px] left-[58%] right-12 top-[120px] z-20 flex flex-col rounded-[32px] border-2 border-violet-300 bg-white/90 p-6 shadow-2xl backdrop-blur">
+        <header class="flex h-[86px] shrink-0 items-center justify-between border-b border-indigo-200 px-2">
+          <div class="flex items-center gap-5"><span class="grid size-16 place-items-center rounded-full bg-blue-700 text-[32px] text-white">▣</span><h3 class="text-[32px] font-black">Audience Questions</h3></div>
+          <span class="grid size-16 place-items-center rounded-2xl bg-violet-600 text-3xl font-black text-white">•••</span>
+        </header>
+        <div class="mt-5 grid min-h-0 flex-1 grid-rows-4 gap-4">
+          ${questions.map((question, index) => `
+            <article class="grid grid-cols-[72px_1fr_64px] items-center gap-5 rounded-[22px] border border-sky-200 bg-white px-5 shadow-lg" data-control-cue="question-${index + 1}">
+              <span class="grid size-[66px] place-items-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-[42px] font-black text-white">?</span>
+              <h4 class="text-[25px] font-black leading-tight text-[#071b59]">${question}</h4>
+              <span class="grid size-14 place-items-center rounded-2xl bg-sky-600 text-2xl font-black text-white">•••</span>
+            </article>`).join('')}
+        </div>
+      </section>`)
   },
   renderForeground() { return renderTailwindForeground(['♫ OPEN ENROLLMENT IS LIVE!', '▣ LOCK ACCESS', '↗ LINK & SHARE', '▥ EARN IMPACT']) },
 }

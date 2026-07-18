@@ -1,4 +1,4 @@
-import { featureCards, renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+import { renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
 
 // Scene 35 owns these design primitives so it can be edited independently.
 const ICONS = {
@@ -156,6 +156,37 @@ const config = {
   }
 export const scene35 = {
   presenterZone: 'left',
-  renderUnderlay() { return renderTailwindUnderlay({ title: config.title, subtitle: config.subtitle, body: featureCards(config.items, 4) }) },
+  renderUnderlay() {
+    const steps = [
+      ['✉', 'Check Your Email', 'Access details and resources are waiting in your inbox.', 'border-cyan-200', 'bg-cyan-50', 'text-cyan-600', 'bg-cyan-500'],
+      ['•••', 'Join the Chat', 'Stay in the conversation and keep the momentum going.', 'border-blue-200', 'bg-blue-50', 'text-blue-600', 'bg-blue-500'],
+      ['▣', 'Explore Your Dashboard', 'Explore programs and personalize your experience.', 'border-violet-200', 'bg-violet-50', 'text-violet-600', 'bg-violet-500'],
+      ['↗', 'Share Your LoopLink', 'Invite others and build something meaningful together.', 'border-fuchsia-200', 'bg-fuchsia-50', 'text-fuchsia-600', 'bg-fuchsia-500'],
+    ]
+    const body = `
+      <section class="flex h-full flex-col justify-center gap-5">
+        <div class="grid h-[420px] grid-cols-4 gap-4">
+          ${steps.map(([symbol, title, copy, border, tint, text, rule]) => `
+            <article class="flex min-w-0 flex-col items-center rounded-[28px] border-2 ${border} bg-white/95 px-5 py-6 text-center shadow-xl">
+              <span class="grid size-[88px] place-items-center rounded-full ${tint} text-[42px] font-black leading-none ${text}">${symbol}</span>
+              <h3 class="mt-5 text-[24px] font-black leading-[1.08] ${text}">${title}</h3>
+              <p class="mt-4 text-[17px] font-semibold leading-[1.4] text-slate-700">${copy}</p>
+              <span class="mt-auto h-1 w-20 rounded-full ${rule}"></span>
+            </article>`).join('')}
+        </div>
+        <article class="mx-auto grid w-[78%] grid-cols-[112px_1fr_1px_110px] items-center gap-6 rounded-[26px] border border-sky-200 bg-white/95 px-7 py-4 shadow-2xl">
+          <img class="size-[104px] rounded-xl border-2 border-blue-200" src="/assets/qr/main-join-qr.png" alt="Visit the Bema Hub community" />
+          <div><h3 class="text-[28px] font-black">Stay connected.</h3><p class="mt-1 text-[17px] font-semibold text-slate-700">Scan to visit the Bema Hub Community.</p><strong class="mt-1 block text-[17px] text-blue-600">Together, we create. Together, we grow.</strong></div>
+          <span class="h-20 bg-indigo-300"></span>
+          <span class="grid size-[92px] place-items-center rounded-full bg-violet-50 text-[48px] font-black text-violet-700">♙</span>
+        </article>
+      </section>`
+    return renderTailwindUnderlay({
+      title: 'THANK YOU &amp; <span class="bg-gradient-to-r from-blue-700 to-violet-700 bg-clip-text text-transparent">NEXT STEPS</span>',
+      subtitle: config.subtitle,
+      body,
+      titleClass: '[&_h2]:!text-[66px] [&_p]:!text-[24px]'
+    })
+  },
   renderForeground() { return renderTailwindForeground(['♡ Thank You', '▶ Next Steps', '▦ Explore Your Dashboard', '◌ Stay Connected']) },
 }

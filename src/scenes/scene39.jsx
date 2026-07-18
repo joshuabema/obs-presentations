@@ -1,4 +1,4 @@
-import { ctaBoard, renderTailwindForeground, renderTailwindUnderlay } from './tailwindBroadcastScene.jsx'
+import { renderTailwindCanvas, renderTailwindForeground } from './tailwindBroadcastScene.jsx'
 
 // Scene 39 owns these design primitives so it can be edited independently.
 const ICONS = {
@@ -157,7 +157,24 @@ const config = {
 export const scene39 = {
   presenterZone: 'left',
   renderUnderlay() {
-    return renderTailwindUnderlay({ title: 'THE LOOP<br/><span class="text-violet-600">CONTINUES.</span>', subtitle: config.subtitle, body: ctaBoard([...config.items, { title: 'Thank you for joining', copy: config.callout, value: '2026' }], 'STAY CONNECTED') })
+    const actions = [
+      ['▣', 'Visit Your', 'Dashboard', 'bg-cyan-500', 'text-blue-600'],
+      ['↗', 'Share Your', 'LoopLink', 'bg-violet-600', 'text-violet-600'],
+      ['•••', 'Join the', 'Community Chat', 'bg-blue-700', 'text-blue-700'],
+    ]
+    return renderTailwindCanvas(`
+      <div class="absolute inset-y-0 left-0 w-[30%] border-r border-white/30 bg-white/10" aria-label="Large presenter profile placement"></div>
+      <div class="absolute right-12 top-9 z-40 flex items-center gap-3 rounded-xl bg-red-600 px-6 py-3 text-xl font-black tracking-wide text-white shadow-xl"><span class="size-4 rounded-full bg-white"></span>END</div>
+      <header class="absolute left-[30%] right-[28%] top-[110px] z-20 text-center">
+        <h2 class="font-display text-[82px] font-black leading-[.9] tracking-[-.05em] text-[#071b59]">THE LOOP<br/><span class="bg-gradient-to-r from-cyan-500 via-blue-600 to-violet-600 bg-clip-text text-transparent">CONTINUES.</span></h2>
+        <div class="mx-auto mt-6 flex w-[480px] items-center gap-4 text-blue-500"><span class="h-1 flex-1 bg-blue-900"></span><span class="text-[34px]">∞</span><span class="h-1 flex-1 bg-blue-900"></span></div>
+        <p class="mt-5 text-[27px] font-black leading-[1.25]">Keep creating. Keep connecting.<br/>Keep <span class="text-blue-600">moving value forward.</span></p>
+      </header>
+      <section class="absolute bottom-[135px] right-10 top-[100px] z-20 flex w-[27%] flex-col items-center">
+        <div class="rounded-[24px] border-4 border-cyan-300 bg-white p-4 shadow-[0_0_30px_rgba(34,211,238,.45)]"><img class="size-[235px]" src="/assets/qr/main-join-qr.png" alt="Scan to continue with Bema Hub" /></div>
+        <div class="mt-5 w-full space-y-4">${actions.map(([symbol, lineOne, lineTwo, iconColor, textColor]) => `<article class="grid h-[102px] grid-cols-[84px_1fr_34px] items-center gap-4 rounded-[20px] border border-sky-200 bg-white/95 px-5 shadow-xl"><span class="grid size-[72px] place-items-center rounded-full ${iconColor} text-[28px] font-black text-white">${symbol}</span><h3 class="text-[22px] font-black leading-[1.05]">${lineOne}<br/><span class="${textColor}">${lineTwo}</span></h3><b class="text-[38px]">›</b></article>`).join('')}</div>
+      </section>
+      <div class="absolute bottom-[155px] left-[32%] z-20 w-[36%] text-center"><div class="mx-auto grid size-[112px] place-items-center rounded-full bg-gradient-to-br from-cyan-500 via-blue-600 to-violet-600 text-[52px] font-black text-white shadow-xl">↻</div><p class="mt-5 text-[24px] font-black leading-tight">Thank you for joining<br/>Bema Hub <span class="text-blue-600">Open Enrollment 2026.</span></p></div>`)
   },
   renderForeground() { return renderTailwindForeground(['⌁ THANK YOU FOR BEING PART OF THE LOOP.', 'CREATE CONNECTIONS.', 'SHARE VALUE.', 'MOVE FORWARD.'], 'END') },
 }
