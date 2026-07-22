@@ -76,6 +76,7 @@ const STATS = [
     icon: "people",
     value: "12,450+",
     label: "Builders Active",
+    liveKey: "builders",
     detail: "Community builders in action",
     tone: "purple",
   },
@@ -92,6 +93,7 @@ const STATS = [
     icon: "lock",
     value: "3,420",
     label: "Qualified LoopLocks",
+    liveKey: "looplocks",
     detail: "Trusted connections created",
     tone: "cyan",
   },
@@ -125,7 +127,7 @@ export const scene08 = {
             <article class="impact-card tone-${stat.tone} rounded-card border border-white/30 bg-white/90 shadow-card backdrop-blur-xl" data-control-cue="${stat.cue}" style="--card-index:${index}">
 
               <div class="reference-card-icon mb-5 grid size-20 place-items-center p-2 rounded-2xl bg-current/5 [&_.broadcast-icon]:size-20">${icon(stat.icon)}</div>
-              <strong class="impact-value">${stat.value}</strong>
+              <strong class="impact-value"${stat.liveKey ? ` data-live-stat="${stat.liveKey}"` : ''}>${stat.value}</strong>
               <h3 class="text-2xl font-bold">${stat.label}</h3>
               <p class="font-bold text-lg">${stat.detail}</p>
             </article>
@@ -144,8 +146,8 @@ export const scene08 = {
         <div class="presenter-inset-frame" aria-hidden="true"><span>PRESENTER</span></div>
         ${renderForegroundBar([
           { icon: "chart", label: "Impact Statistics" },
-          { icon: "people", label: "<strong>12,450+</strong> Builders Active" },
-          { icon: "lock", label: "<strong>3,420</strong> Qualified LoopLocks" },
+          { icon: "people", label: "<strong data-live-footer-stat=\"builders\">12,450+</strong> Builders Active" },
+          { icon: "lock", label: "<strong data-live-footer-stat=\"looplocks\">3,420</strong> Qualified LoopLocks" },
           { icon: "music", label: "Creative value in motion" },
           { icon: "eye", label: "<strong>128</strong> Watching Live" },
         ])}

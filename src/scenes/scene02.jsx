@@ -42,15 +42,19 @@ export const scene02 = {
     return sceneMarkup(`
       <section class="scene scene02 absolute inset-0 overflow-hidden font-sans text-bema-navy">
         <div class="particle-layer particle-field">${particles}</div>
-        <div class="bema-card glass-card visualizer-shell soft-glow wave-layer relative overflow-hidden rounded-panel border border-sky-200/60 bg-white/80 shadow-card backdrop-blur-xl">
-          <div class="scene02-copy">
-            <p class="eyebrow">Welcome Music Visualizer</p>
-            <h2 class="stage-title">Creative Value is entering the room.</h2>
-            <p class="stage-subtitle muted">Waveform, equalizer bars, particles, and center logo pulse are all live HTML elements.</p>
-          </div>
-          <div class="waveform" aria-hidden="true">${waveform}</div>
+        <div class="scene02-brand"><img src="/assets/logos/bemahub-reference-mark.svg" alt=""><img src="/assets/logos/bemahub-wordmark.svg" alt="BemaHub"></div>
+        <div class="scene02-live"><strong><i></i>LIVE</strong><span>♟ 1,246</span></div>
+        <header class="scene02-copy">
+          <p>WELCOME</p>
+          <h2>MUSIC VISUALIZER</h2>
+          <h3>Feel the beat. We’re getting started soon!</h3>
+          <div><span></span><b>♥</b><span></span></div>
+        </header>
+        <div class="scene02-waveform-back" aria-hidden="true">${waveform}</div>
+        <div class="scene02-presenter-space" aria-label="Presenter camera placement"></div>
+        <div class="visualizer-shell wave-layer">
           <div class="logo-pulse">
-            <div class="logo-mark">BC</div>
+            <img class="logo-mark" src="/assets/logos/bemahub-reference-mark.svg" alt="BemaHub mark" />
           </div>
           <div class="equalizer" aria-hidden="true">${equalizer}</div>
         </div>
@@ -59,7 +63,7 @@ export const scene02 = {
   },
 
   renderForeground(context) {
-    return sceneMarkup(`<section class="scene-foreground scene02-foreground">${renderTicker(context.ticker.scene02, 'local')}</section>`)
+    return sceneMarkup(`<section class="scene-foreground scene02-foreground"><div class="scene02-presenter-frame" aria-hidden="true"></div><div class="scene02-status-row"><span>☺　Welcome Builders!</span><span>▣　Open Enrollment 2026</span><span>♡　Build together. Grow together.</span><span>♙　You belong here.</span><span>◯　Say hello in chat</span><span>◉　128 Watching Live</span></div>${renderTicker(context.ticker.scene02, 'local')}</section>`)
   },
 
   render(context) {

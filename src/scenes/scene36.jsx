@@ -13,6 +13,10 @@ function icon(name) {
   return `<span class="broadcast-icon inline-grid shrink-0 place-items-center [&>svg]:h-full [&>svg]:w-full [&>svg]:fill-none [&>svg]:stroke-current [&>svg]:stroke-[1.8]" data-icon-name="${name}" data-icon-fallback="${ICONS[name] ? 'false' : 'true'}" aria-hidden="true">${ICONS[name] ?? ICONS.signal}</span>`
 }
 
+function escapeHtml(value) {
+  return String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
+}
+
 function renderBrand({ enrollment = false } = {}) {
   return `
     <div class="broadcast-brand absolute left-[62px] top-[42px] z-20 flex items-center gap-3 font-sans text-bema-navy">
@@ -156,13 +160,15 @@ const config = {
   }
 export const scene36 = {
   presenterZone: 'left',
-  renderUnderlay() {
-    const questions = [
+  renderUnderlay(context) {
+    const defaultQuestions = [
       'How do Access Levels work?',
       'What counts as a LoopLock?',
       'Where do I see my Loop Activity?',
       'How do I choose a campaign?',
     ]
+    const requestedQuestions = context.url.getAll('qa').map((question) => question.trim()).filter(Boolean)
+    const questions = Array.from({ length: 4 }, (_, index) => requestedQuestions[index] || defaultQuestions[index])
     return renderTailwindCanvas(`
       <div class="absolute inset-y-0 left-0 w-[30%] border-r border-white/30 bg-white/10" aria-label="Large presenter profile placement"></div>
       <header class="absolute left-[29%] top-[190px] z-20 w-[29%] px-5 text-center">
@@ -177,9 +183,9 @@ export const scene36 = {
         </header>
         <div class="mt-5 grid min-h-0 flex-1 grid-rows-4 gap-4">
           ${questions.map((question, index) => `
-            <article class="grid grid-cols-[72px_1fr_64px] items-center gap-5 rounded-[22px] border border-sky-200 bg-white px-5 shadow-lg" data-control-cue="question-${index + 1}">
+            <article class="grid grid-cols-[72px_1fr_64px] items-center gap-5 rounded-[22px] border border-sky-200 bg-white px-5 shadow-lg ${context.selectedQuestion === index + 1 ? 'is-operator-selected' : ''}" data-control-cue="question-${index + 1}" data-operator-question-index="${index + 1}" aria-current="${context.selectedQuestion === index + 1}">
               <span class="grid size-[66px] place-items-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-[42px] font-black text-white">?</span>
-              <h4 class="text-[25px] font-black leading-tight text-[#071b59]">${question}</h4>
+              <h4 class="text-[25px] font-black leading-tight text-[#071b59]">${escapeHtml(question)}</h4>
               <span class="grid size-14 place-items-center rounded-2xl bg-sky-600 text-2xl font-black text-white">•••</span>
             </article>`).join('')}
         </div>

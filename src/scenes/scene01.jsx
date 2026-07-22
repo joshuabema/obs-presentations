@@ -130,7 +130,7 @@ export const scene01 = {
               </div>
               <div class="pill-row scene01-qr-pills">
                 <span class="pill-label tag">${context.metrics.countdown.qr.codeLabel}</span>
-                <span class="pill-label tag">Builders Live</span>
+                <span class="pill-label tag" data-live-builders-count>Builders Live</span>
               </div>
             </section>
           </aside>

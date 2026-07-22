@@ -20,7 +20,10 @@ Composite presentation pages include an operator layer over the bottom of the
 scene. The bottom strip provides Previous/Next navigation and direct Scene
 01–39 selection. Reference, Overlay, and Live are separate viewing modes. The
 selected scene's cue row is generated from `src/sceneControls.js` and provides
-Reset, Entry, its operator-controlled During cues, and Exit.
+Reset, Entry, layer-specific Background/Foreground/Footer entrances, a full
+staggered sequence, its operator-controlled During cues, and Exit. Entry reveals
+only the background plus the logo/LIVE header so the remaining layers can be
+brought on independently.
 
 Reference storyboard mode displays the complete original storyboard sheet at
 its natural aspect ratio and allows the page to scroll to its specification
@@ -62,6 +65,10 @@ Replace `08` with the required two-digit scene number.
 - Force the PNG poster — add `&bgVideo=false`
 - Background diagnostics — add `&bgDebug=true` and omit `clean=true`
 - Scene 08 presenter inset side — add `&presenterInset=right` (defaults to `left`)
+- Production API data (Scenes 01, 08, 37 and the ticker) — add `&dataMode=live&sessionId=open_enrollment_2026`
+- Rehearsal/mock data — add `&dataMode=simulated` (the default)
+- Override the API root — add `&apiBase=https%3A%2F%2Fexample.test%2Fwp-json%2Fbmh%2Fv1%2Fobs`
+- Force the global ticker on or off — add `&ticker=show` or `&ticker=hide`
 
 To inspect the two browser layers for a scene, open its `underlay` URL for the
 background and editable scene graphics, then its `foreground` URL for the
@@ -77,6 +84,46 @@ In OBS, create the sources in this order from back to front:
 
 Set both browser sources to 1920×1080. The foreground page is genuinely
 transparent outside its lower thirds, tickers, and other Z3 elements.
+
+## Live data and the global ticker
+
+Only Scenes 01, 08, and 37 request scene-specific production values. All other
+walkthrough scenes remain deterministic. The global activity ticker is part of
+the foreground source and independently polls `/live-activity` on every scene.
+Its queue and operator state survive navigation through `localStorage`, and
+open same-origin browser views synchronize with `BroadcastChannel`.
+
+The operator controls provide Show/Hide, Pause/Resume, Clear, Reconnect, and a
+local priority announcement. The ticker continues receiving safe public
+activity while hidden or paused. It is muted by default on Scenes 38 and 39;
+use `ticker=show` when it should remain visible there. API activity is rendered
+only when `safe_for_public_display` is explicitly `true`.
+
+Scene 36 question buttons are operator selections. Selection persists across a
+reload, and four curated questions can be supplied with repeated `qa` query
+parameters; `question=1` through `question=4` selects the initial item.
+
+Scene 37 maps scans, LoopLinks, New Builders, enrollment progress, and public
+recent activity from the documented OBS endpoints. The supplied API contract
+does not currently define a dedicated `questions_answered` field, so the client
+uses it when present and otherwise falls back to session actions. Confirm that
+mapping with the backend owner before treating that figure as a production
+question count.
+
+## Layer animation controls
+
+Entry now reveals only Z0 plus the logo/live header. Background In does the same
+explicitly; Foreground In and Footer In reveal their respective Z3 elements.
+Full Sequence resets the scene and plays background/header, foreground, then
+footer in order. Reset returns every layer to its pre-entry state.
+
+## Review evidence
+
+Run `npm run review:capture` against the local Vite server to create an ignored
+`review-package/` directory containing all 39 live, reference, overlay, diff,
+and transparent-foreground captures, plus representative full-sequence motion
+recordings for Scenes 01, 08, 37, and 39. The generated report includes alpha
+checks for every foreground output.
 
 ## Architecture-proof scenes
 

@@ -7,7 +7,9 @@ import { renderBackgroundLayer, initBackgroundLayer } from './components/Backgro
 import { scenes } from './scenes/index.js'
 import { loadPresentationData } from './dataService.js'
 import { getSceneBackground } from './utils/getSceneBackground.js'
-import { applySceneCue, disposeSceneLifecycle, registerSceneCleanup, resetSceneCue } from './sceneCueEngine.js'
+import { bindTickerControls, getGlobalTicker, initGlobalTicker, renderGlobalTicker, renderTickerControls } from './globalTicker.js'
+import { getInitialLiveData, startSceneLiveData } from './obsLiveData.js'
+import { applySceneCue, disposeSceneLifecycle, hydrateLayerAnimationTargets, LAYER_CUES, registerSceneCleanup, resetSceneCue } from './sceneCueEngine.js'
 import { sceneControlById } from './sceneControls.js'
 
 const app = document.querySelector('#app')
@@ -60,6 +62,7 @@ const UI = Object.freeze({
 let detachCanvasScale
 let detachDebugTools
 let detachNavigation
+let detachGlobalTicker
 let startSceneSetup
 
 const debugState = {
@@ -90,6 +93,7 @@ async function boot() {
   const paused = params.get('paused') === 'true'
   const showControls = render === 'composite' && !clean && !controllerPreview
   const controlsVisible = params.get('controls') !== 'false'
+  const selectedQuestion = getSelectedQuestion(params)
 
   document.documentElement.dataset.output = output
   document.documentElement.dataset.render = render
@@ -123,6 +127,7 @@ async function boot() {
     slide,
     allSlides: data.slides,
     ticker: data.ticker,
+    liveData: getInitialLiveData(),
     url: params,
     refOpacity: debugState.referenceOpacity,
     refOnTop: debugState.overlayReferenceOnTop,
@@ -130,6 +135,7 @@ async function boot() {
     canRenderLive,
     showControls,
     controlsVisible,
+    selectedQuestion,
   }
 
   document.title = `BemaHub OBS - Scene ${slide.id} ${mode}`
@@ -137,11 +143,18 @@ async function boot() {
   bindPresentationNavigation(context)
   bindOnCanvasControls(context)
 
+  detachGlobalTicker?.()
+  detachGlobalTicker = initGlobalTicker(app, context)
+
   disposeSceneLifecycle(app)
   startSceneSetup = () => {
     disposeSceneLifecycle(app)
-    const cleanup = sceneRenderer?.setup?.(app, context)
-    registerSceneCleanup(app, cleanup)
+    const cleanupScene = sceneRenderer?.setup?.(app, context)
+    const cleanupLiveData = startSceneLiveData(app, context, (items) => getGlobalTicker(context.url).pushActivity(items))
+    registerSceneCleanup(app, () => {
+      cleanupScene?.()
+      cleanupLiveData?.()
+    })
   }
 
   const requestedCue = params.get('cue') || (params.get('replay') === 'entry' ? 'entry' : '')
@@ -205,6 +218,7 @@ function renderApp(context, sceneRenderer) {
                 ${showUnderlay ? `<div class="live-layer underlay-layer absolute inset-0" data-live-layer="underlay">${underlayMarkup}</div>` : ''}
                 ${showForeground ? `<div class="live-layer foreground-layer absolute inset-0" data-live-layer="foreground">${foregroundMarkup}</div>` : ''}
               </div>` : ''}
+              ${(mode === 'live' || mode === 'overlay') && showForeground ? renderGlobalTicker(context) : ''}
             </section>
             ${context.showControls ? renderOnCanvasControls(context) : ''}
             ${showSpec ? renderSpecSheet(slide, context) : ''}
@@ -215,6 +229,7 @@ function renderApp(context, sceneRenderer) {
     </main>`
 
   hydrateSceneCueTargets(context)
+  hydrateLayerAnimationTargets(app)
   bindCanvasScale(context)
   bindDebugTools(context)
   if (showBackground) initBackgroundLayer(app)
@@ -237,6 +252,10 @@ function renderOnCanvasControls(context) {
   const cueButtons = [
     `<button type="button" data-reset-scene class="${UI.controlButton} !min-w-[96px]">Reset</button>`,
     `<button type="button" data-trigger-cue="${config?.entryCue.id ?? 'entry'}" class="${UI.controlButton} !min-w-[110px]">Entry · ${config?.entryCue.label ?? 'Entry'}</button>`,
+    `<button type="button" data-trigger-cue="${LAYER_CUES.background}" class="${UI.controlButton} !min-w-fit">Background In</button>`,
+    `<button type="button" data-trigger-cue="${LAYER_CUES.foreground}" class="${UI.controlButton} !min-w-fit">Foreground In</button>`,
+    `<button type="button" data-trigger-cue="${LAYER_CUES.footer}" class="${UI.controlButton} !min-w-fit">Footer In</button>`,
+    `<button type="button" data-trigger-cue="${LAYER_CUES.full}" class="${UI.controlButton} !min-w-fit !border-cyan-400/60 !bg-cyan-950/90 !text-cyan-100">Play Full Sequence</button>`,
     ...(config?.duringCues ?? []).map((cue) => `<button type="button" data-trigger-cue="${cue.id}" class="${UI.controlButton} !min-w-fit">${cue.label}</button>`),
     `<button type="button" data-trigger-cue="${config?.exitCue.id ?? 'exit'}" class="${UI.controlButton} !min-w-[110px] !border-rose-400/50 !bg-rose-950/90 !text-rose-200">Exit · ${config?.exitCue.label ?? 'Exit'}</button>`,
   ].join('')
@@ -252,6 +271,7 @@ function renderOnCanvasControls(context) {
         <button type="button" data-presentation-mode="live" class="${UI.controlButton} ${context.mode === 'live' ? `is-active ${UI.controlButtonActive}` : ''}">Live</button>
       </div>
       ${context.mode === 'overlay' ? renderOverlayControls() : ''}
+      ${renderTickerControls()}
       <div class="presentation-cue-panel mb-2 flex max-h-[104px] items-center gap-2 overflow-x-auto rounded-[13px] border border-indigo-200/30 bg-slate-950/95 p-2 shadow-2xl backdrop-blur-xl" data-scene-cue-panel data-scene="${context.slide.id}">
         <span class="shrink-0 px-2 text-[10px] font-black uppercase tracking-[.15em] text-indigo-300">Scene ${context.slide.id} cues</span>
         ${cueButtons}
@@ -280,6 +300,7 @@ function renderOverlayControls() {
 
 function bindOnCanvasControls(context) {
   if (!context.showControls) return
+  bindTickerControls(app, context.url)
   const controls = app.querySelector('.presentation-controls')
   const toggle = app.querySelector('[data-toggle-presentation-controls]')
   toggle?.addEventListener('click', () => {
@@ -318,11 +339,21 @@ function bindOnCanvasControls(context) {
         location.assign(url)
         return
       }
-      if (cue === 'entry') {
+      if (context.slide.id === '36' && /^question-[1-4]$/.test(cue)) {
+        const selected = Number(cue.split('-')[1])
+        try { localStorage.setItem('bemahub.obs.scene36.selectedQuestion', String(selected)) } catch { /* Storage can be disabled in OBS. */ }
+        app.querySelectorAll('[data-operator-question-index]').forEach((element) => {
+          const isSelected = Number(element.dataset.operatorQuestionIndex) === selected
+          element.classList.toggle('is-operator-selected', isSelected)
+          element.setAttribute('aria-current', isSelected ? 'true' : 'false')
+        })
+        app.querySelector('.visual-stage')?.setAttribute('data-selected-question', String(selected))
+      }
+      if (cue === 'entry' || cue === LAYER_CUES.full) {
         disposeSceneLifecycle(app)
       }
       applySceneCue(app, cue)
-      if (cue === 'entry' && !context.paused) startSceneSetup?.()
+      if ((cue === 'entry' || cue === LAYER_CUES.full) && !context.paused) startSceneSetup?.()
       if (cue === 'exit') {
         disposeSceneLifecycle(app)
       }
@@ -507,6 +538,15 @@ function parseOpacity(value) {
   if (value == null || value === '') return 0.7
   const number = Number(value)
   return Number.isFinite(number) ? Math.min(1, Math.max(0, number)) : 0.7
+}
+function getSelectedQuestion(params) {
+  const requested = Number(params.get('question'))
+  if (requested >= 1 && requested <= 4) return requested
+  try {
+    const saved = Number(localStorage.getItem('bemahub.obs.scene36.selectedQuestion'))
+    if (saved >= 1 && saved <= 4) return saved
+  } catch { /* Storage can be disabled in OBS. */ }
+  return 1
 }
 function normalizeSceneId(value) { const digits = String(value ?? '').replace(/\D/g, ''); const number = Number(digits); return number >= 1 && number <= 39 ? String(number).padStart(2, '0') : DEFAULT_SCENE }
 function showBootError(error) { console.error(error); app.innerHTML = `<section class="app-shell"><div class="error-card"><p class="eyebrow">Scene Engine Error</p><h1>Presentation app failed to load.</h1><p>${error.message}</p></div></section>` }
