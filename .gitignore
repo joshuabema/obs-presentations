@@ -12,6 +12,13 @@ dist
 dist-ssr
 test-results
 playwright-report
+<<<<<<< Updated upstream
+=======
+blob-report
+coverage
+artifacts
+review-package/
+>>>>>>> Stashed changes
 *.local
 
 # Raw handoff ZIP extraction folders (curated assets live under public/assets)

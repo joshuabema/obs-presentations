@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test'
+import { LAYER_CUES } from '../src/sceneCueEngine.js'
 import { sceneControlById } from '../src/sceneControls.js'
+
+const layerCueIds = Object.values(LAYER_CUES)
 
 const sceneIds = Array.from({ length: 39 }, (_, index) => String(index + 1).padStart(2, '0'))
 const outputs = [
@@ -62,12 +65,24 @@ test('presentation controls, debug state, navigation, and cue lifecycle remain i
   await page.goto('/?scene=08&mode=live&output=storyboard&render=composite&paused=true&bgVideo=false')
   await expect(page.locator('[data-presentation-scene]')).toHaveCount(39)
   await expect(page.locator('[data-scene-cue-panel]')).toHaveAttribute('data-scene', '08')
-  await expect(page.locator('[data-trigger-cue]')).toHaveCount(sceneControlById['08'].duringCues.length + 2)
+  await expect(page.locator('[data-trigger-cue]')).toHaveCount(sceneControlById['08'].duringCues.length + layerCueIds.length + 2)
 
   await page.locator('[data-reset-scene]').click()
   await expect(page.getByTestId('visual-stage')).toHaveAttribute('data-active-cue', 'reset')
   await page.locator('[data-trigger-cue="entry"]').click()
   await expect(page.getByTestId('visual-stage')).toHaveAttribute('data-active-cue', 'entry')
+  await expect(page.getByTestId('visual-stage')).toHaveClass(/is-layer-background-visible/)
+  await expect(page.getByTestId('visual-stage')).not.toHaveClass(/is-layer-foreground-visible/)
+  await expect(page.getByTestId('visual-stage')).not.toHaveClass(/is-layer-footer-visible/)
+  await page.locator(`[data-trigger-cue="${LAYER_CUES.foreground}"]`).click()
+  await expect(page.getByTestId('visual-stage')).toHaveClass(/is-layer-foreground-visible/)
+  await page.locator(`[data-trigger-cue="${LAYER_CUES.footer}"]`).click()
+  await expect(page.getByTestId('visual-stage')).toHaveClass(/is-layer-footer-visible/)
+  await page.locator(`[data-trigger-cue="${LAYER_CUES.full}"]`).click()
+  await expect(page.getByTestId('visual-stage')).toHaveClass(/cue-layer-full/)
+  await expect(page.getByTestId('visual-stage')).toHaveClass(/is-layer-background-visible/)
+  await expect(page.getByTestId('visual-stage')).toHaveClass(/is-layer-foreground-visible/)
+  await expect(page.getByTestId('visual-stage')).toHaveClass(/is-layer-footer-visible/)
   await page.locator('[data-trigger-cue="entry"]').click()
   await expect(page.getByTestId('visual-stage')).toHaveAttribute('data-active-cue', 'entry')
   const duringCue = sceneControlById['08'].duringCues[0].id
@@ -82,6 +97,81 @@ test('presentation controls, debug state, navigation, and cue lifecycle remain i
   await expect(page.locator('[data-scene-cue-panel]')).toHaveAttribute('data-scene', '09')
   await page.locator('[data-previous-scene]').click()
   await expect(page).toHaveURL(/scene=08/)
+})
+
+test('global ticker controls persist across scene changes without resetting the queue', async ({ page }) => {
+  await page.goto('/?scene=07&mode=live&output=storyboard&render=composite&paused=true&bgVideo=false')
+  const ticker = page.locator('[data-global-live-ticker]')
+  await expect(ticker).toBeVisible()
+
+  await page.locator('[data-ticker-command="clear"]').click()
+  await expect(ticker.locator('[data-ticker-item-id="empty"]').first()).toContainText('Waiting for live activity')
+  await page.locator('[data-ticker-priority-input]').fill('Enrollment closes in fifteen minutes')
+  await page.locator('[data-ticker-command="priority"]').click()
+  await expect(ticker).toContainText('Enrollment closes in fifteen minutes')
+
+  await page.locator('[data-ticker-command="toggle-paused"]').click()
+  await expect(ticker).toHaveClass(/is-paused/)
+  const sequence = await ticker.getAttribute('data-ticker-sequence')
+  await page.locator('[data-next-scene]').click()
+  await expect(page).toHaveURL(/scene=08/)
+  await expect(page.locator('[data-global-live-ticker]')).toContainText('Enrollment closes in fifteen minutes')
+  await expect(page.locator('[data-global-live-ticker]')).toHaveClass(/is-paused/)
+  expect(Number(await page.locator('[data-global-live-ticker]').getAttribute('data-ticker-sequence'))).toBeGreaterThanOrEqual(Number(sequence))
+
+  await page.locator('[data-ticker-command="toggle-visible"]').click()
+  await expect(page.locator('[data-global-live-ticker]')).toHaveClass(/is-hidden/)
+  await page.locator('[data-ticker-command="toggle-visible"]').click()
+  await expect(page.locator('[data-global-live-ticker]')).not.toHaveClass(/is-hidden/)
+  await page.locator('[data-ticker-command="reconnect"]').click()
+  await expect(page.locator('[data-global-ticker-status]')).toHaveText(/SIM|LIVE/)
+})
+
+test('Scene 36 retains the operator-selected question and supports curated URL questions', async ({ page }) => {
+  await page.goto('/?scene=36&mode=live&output=storyboard&render=composite&paused=true&bgVideo=false&qa=First+curated+question&qa=Second+curated+question&qa=Third+curated+question&qa=Fourth+curated+question')
+  await expect(page.locator('[data-operator-question-index="1"]')).toContainText('First curated question')
+  await page.locator('[data-trigger-cue="question-3"]').click()
+  await expect(page.locator('[data-operator-question-index="3"]')).toHaveAttribute('aria-current', 'true')
+  await page.reload()
+  await expect(page.locator('[data-operator-question-index="3"]')).toHaveAttribute('aria-current', 'true')
+})
+
+test('production OBS data updates Scenes 01, 08, and 37 while non-live scenes remain restricted to ticker activity', async ({ page }) => {
+  const requestedEndpoints = []
+  await page.route('**/wp-json/bmh/v1/obs/**', async (route) => {
+    const endpoint = new URL(route.request().url()).pathname.split('/').pop()
+    requestedEndpoints.push(endpoint)
+    const bodies = {
+      'live-stats': { totals: { active_participants: 444, total_joined: 15000, joined_this_session: 91, referral_links_created: 137, referral_conversions: 3600, qr_scans: 275, questions_answered: 44, activity_per_minute: 5.2 }, updated_at: '2026-07-22T09:00:00Z' },
+      'goal-progress': { current_value: 410, goal_target: 500, progress_percent: 82 },
+      'live-activity': { items: [{ id: 'live-proof-1', message: 'A public-safe Builder update arrived', event_type: 'signup_completed', priority: 'high', safe_for_public_display: true, timestamp: '2026-07-22T09:00:00Z' }] },
+      'session-stats': { joined_this_session: 91, qr_scans_this_session: 275, actions_this_session: 44 },
+    }
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(bodies[endpoint]) })
+  })
+
+  await page.goto('/?scene=01&mode=live&output=obs&render=composite&clean=true&bgVideo=false&dataMode=live')
+  await expect(page.locator('.scene01-stat-card .scene01-stat-copy > strong').nth(1)).toHaveText('444')
+  await expect(page.locator('[data-live-builders-count]')).toHaveText('444 Builders Live')
+
+  await page.goto('/?scene=08&mode=live&output=obs&render=composite&clean=true&bgVideo=false&dataMode=live')
+  await expect(page.locator('[data-live-stat="builders"]')).toHaveText('444')
+  await expect(page.locator('[data-live-stat="looplocks"]')).toHaveText('3,600')
+
+  await page.goto('/?scene=37&mode=live&output=obs&render=composite&clean=true&bgVideo=false&dataMode=live')
+  await expect(page.locator('[data-live-metric="scans"]')).toHaveText('275')
+  await expect(page.locator('[data-live-metric="builders"]')).toHaveText('91')
+  await expect(page.locator('[data-live-metric="looplinks"]')).toHaveText('137')
+  await expect(page.locator('[data-live-metric="questions"]')).toHaveText('44')
+  await expect(page.locator('[data-live-progress-value]')).toHaveText('82%')
+  await expect(page.locator('[data-live-activity-feed]')).toContainText('A public-safe Builder update arrived')
+  await expect(page.locator('[data-global-live-ticker]')).toContainText('A public-safe Builder update arrived')
+  expect(requestedEndpoints).toEqual(expect.arrayContaining(['live-stats', 'goal-progress', 'live-activity', 'session-stats']))
+
+  requestedEndpoints.length = 0
+  await page.goto('/?scene=02&mode=live&output=obs&render=composite&clean=true&bgVideo=false&dataMode=live')
+  await expect.poll(() => requestedEndpoints.length).toBeGreaterThan(0)
+  expect(new Set(requestedEndpoints)).toEqual(new Set(['live-activity']))
 })
 
 test('full reference, clean composition crop, and overlay comparison states are correct', async ({ page }) => {
@@ -124,12 +214,130 @@ test('full reference, clean composition crop, and overlay comparison states are 
   await expect(page.locator('.debug-overlay')).toHaveCount(0)
 })
 
+<<<<<<< Updated upstream
+=======
+test('all clean reference assets load successfully at 1920x1080 and scene 20/23 mappings are correct', async ({ request }) => {
+  for (const slide of slides) {
+    const response = await request.get(slide.referenceImage)
+    expect(response.ok(), `${slide.id} reference request failed`).toBeTruthy()
+    const buffer = Buffer.from(await response.body())
+    const meta = await sharp(buffer).metadata()
+    const dimensions = { width: meta.width, height: meta.height }
+    expect(dimensions).toEqual({ width: 1920, height: 1080 })
+  }
+
+  const scene20 = slides.find((slide) => slide.id === '20')
+  const scene23 = slides.find((slide) => slide.id === '23')
+  expect(scene20.referenceImage).toContain('20_participation_assets_delivered_1920x1080.png')
+  expect(scene20.storyboardImage).toContain('20_participation_assets_delivered.png')
+  expect(scene23.referenceImage).toContain('23_qualified_looplocks_1920x1080.png')
+  expect(scene23.storyboardImage).toContain('23_qualified_looplocks.png')
+})
+
+test('all 39 foreground outputs preserve transparent Z3 canvases', async ({ page }) => {
+  for (const sceneId of sceneIds) {
+    await page.goto(`/?scene=${sceneId}&mode=live&output=obs&render=foreground&clean=true&paused=true&bgVideo=false&ticker=hide`)
+    const screenshot = await page.getByTestId('visual-stage').screenshot({ omitBackground: true })
+    const { data, info } = await sharp(screenshot).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+    let transparentPixels = 0
+    for (let index = 3; index < data.length; index += info.channels) {
+      if (data[index] === 0) transparentPixels += 1
+    }
+    const transparentRatio = transparentPixels / (info.width * info.height)
+    expect(transparentRatio, `scene ${sceneId} foreground transparency`).toBeGreaterThan(0.55)
+    expect(data[3], `scene ${sceneId} top-left alpha`).toBe(0)
+    expect(data[((info.width - 1) * info.channels) + 3], `scene ${sceneId} top-right alpha`).toBe(0)
+  }
+})
+
+test('original storyboard sheets remain accessible through referenceView=sheet', async ({ page, request }) => {
+  const scene39 = slides.find((slide) => slide.id === '39')
+  const response = await request.get(scene39.storyboardImage)
+  expect(response.ok()).toBeTruthy()
+
+  await page.goto('/?scene=39&mode=reference&output=storyboard&render=composite&referenceView=sheet&paused=true')
+  await expect(page.locator('[data-reference-variant="sheet"]')).toBeVisible()
+  await expect(page.locator('[data-reference-variant="sheet"] img')).toHaveAttribute('src', scene39.storyboardImage)
+})
+
+test('scene 39 accepted headline remains locked', async ({ page }) => {
+  await page.goto('/?scene=39&mode=live&output=obs&render=composite&clean=true&paused=true&bgVideo=false')
+  await page.waitForSelector('[data-match-region="headline"]')
+  await page.evaluate(async () => {
+    await document.fonts.ready
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+  })
+
+  const result = await page.evaluate(() => {
+    const headline = document.querySelector('[data-match-region="headline"]')
+    const stage = document.querySelector('[data-visual-stage]')
+    const line1 = headline?.querySelector('h2')
+    const line2 = headline?.querySelector('p')
+    const rect = headline?.getBoundingClientRect()
+    const stageRect = stage?.getBoundingClientRect()
+    const line1Style = line1 ? getComputedStyle(line1) : null
+    const line2Style = line2 ? getComputedStyle(line2) : null
+    const scaleX = rect && stageRect ? rect.width / headline.offsetWidth : null
+    const scaleY = rect && stageRect ? rect.height / headline.offsetHeight : null
+
+    return {
+      box: rect && stageRect
+        ? {
+            x: headline.offsetLeft,
+            y: headline.offsetTop,
+            width: headline.offsetWidth,
+            height: headline.offsetHeight,
+          }
+        : null,
+      scale: scaleX && scaleY ? { x: scaleX, y: scaleY } : null,
+      line1: line1Style
+        ? {
+            fontFamily: line1Style.fontFamily,
+            fontSize: line1Style.fontSize,
+            fontWeight: line1Style.fontWeight,
+            lineHeight: line1Style.lineHeight,
+            letterSpacing: line1Style.letterSpacing,
+          }
+        : null,
+      line2: line2Style
+        ? {
+            fontFamily: line2Style.fontFamily,
+            fontSize: line2Style.fontSize,
+            fontWeight: line2Style.fontWeight,
+            lineHeight: line2Style.lineHeight,
+            letterSpacing: line2Style.letterSpacing,
+            marginTop: line2Style.marginTop,
+          }
+        : null,
+    }
+  })
+
+  expect(result.box).toEqual({ x: 619, y: 198, width: 790, height: 162 })
+  expect(result.line1).toEqual({
+    fontFamily: '"Helvetica Neue", Arial, sans-serif',
+    fontSize: '126px',
+    fontWeight: '900',
+    lineHeight: '105.84px',
+    letterSpacing: '-8.568px',
+  })
+  expect(result.line2).toEqual({
+    fontFamily: '"Helvetica Neue", Arial, sans-serif',
+    fontSize: '148px',
+    fontWeight: '900',
+    lineHeight: '124.32px',
+    letterSpacing: '-9.62px',
+    marginTop: '-4px',
+  })
+})
+
+>>>>>>> Stashed changes
 test('every selected scene renders exactly its catalogued operator cues', async ({ page }) => {
   const missingTargets = []
   for (const sceneId of sceneIds) {
     await page.goto(`/?scene=${sceneId}&mode=live&output=storyboard&render=composite&paused=true&bgVideo=false`)
     const expectedCues = [
       sceneControlById[sceneId].entryCue.id,
+      ...layerCueIds,
       ...sceneControlById[sceneId].duringCues.map((cue) => cue.id),
       sceneControlById[sceneId].exitCue.id,
     ]
@@ -165,7 +373,7 @@ test('scene 32 completes the full operator sequence twice without stale cue stat
 
 for (const sceneId of sceneIds) {
   test(`@visual scene ${sceneId} live composite`, async ({ page }) => {
-    await page.goto(`/?scene=${sceneId}&mode=live&output=obs&render=composite&clean=true&paused=true&bgVideo=false`)
+    await page.goto(`/?scene=${sceneId}&mode=live&output=obs&render=composite&clean=true&paused=true&bgVideo=false&ticker=hide`)
     await expect(page.getByTestId('visual-stage')).toBeVisible()
     await expect(page).toHaveScreenshot(`scene-${sceneId}-live-composite.png`)
   })
@@ -174,7 +382,7 @@ for (const sceneId of sceneIds) {
 for (const sceneId of ['01', '03', '08', '14', '38']) {
   test(`@visual scene ${sceneId} storyboard shell`, async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1200 })
-    await page.goto(`/?scene=${sceneId}&mode=overlay&output=storyboard&render=composite&paused=true&bgVideo=false`)
+    await page.goto(`/?scene=${sceneId}&mode=overlay&output=storyboard&render=composite&paused=true&bgVideo=false&ticker=hide`)
     await expect(page.getByTestId('storyboard-canvas')).toBeVisible()
     await expect(page).toHaveScreenshot(`scene-${sceneId}-storyboard-shell.png`)
   })
@@ -188,7 +396,7 @@ test('@visual scene 32 clean reference composition', async ({ page }) => {
 
 test('@visual scene 32 overlay comparison', async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1200 })
-  await page.goto('/?scene=32&mode=overlay&output=storyboard&render=composite&paused=true&bgVideo=false')
+  await page.goto('/?scene=32&mode=overlay&output=storyboard&render=composite&paused=true&bgVideo=false&ticker=hide')
   await expect(page.locator('[data-comparison-controls]')).toBeVisible()
   await expect(page).toHaveScreenshot('scene-32-overlay-comparison.png')
 })
