@@ -171,7 +171,7 @@ export const scene36 = {
     const questions = Array.from({ length: 4 }, (_, index) => requestedQuestions[index] || defaultQuestions[index])
     return renderTailwindCanvas(`
       <div class="absolute inset-y-0 left-0 w-[30%] border-r border-white/30 bg-white/10" aria-label="Large presenter profile placement"></div>
-      <header class="absolute left-[29%] top-[190px] z-20 w-[29%] px-5 text-center">
+      <header class="major-scene-heading absolute left-[29%] top-[190px] z-20 w-[29%] px-5 text-center">
         <h2 class="font-display text-[78px] font-black leading-none tracking-[-.05em] text-[#071b59]"><span class="bg-gradient-to-r from-violet-600 to-blue-700 bg-clip-text text-transparent">LIVE</span> Q&amp;A</h2>
         <div class="mx-auto mt-5 h-1 w-32 rounded-full bg-gradient-to-r from-cyan-400 to-violet-600"></div>
         <p class="mt-6 text-[29px] font-bold leading-tight text-[#16255c]">Your questions<br/>are welcome.</p>

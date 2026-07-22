@@ -56,7 +56,7 @@ export const scene03 = {
   presenterZone: "center-left",
   renderUnderlay() {
     return sceneMarkup(
-      `<section class="scene proof-scene scene03 proof-enter absolute inset-0 overflow-hidden font-sans text-bema-navy">${renderBrand()}${renderLiveBadge()}<div class="scene03-presenter-space" aria-label="Presenter camera placement"></div><article class="studio-display mr-20 ">${renderBrand()}<h2>Better Benefits.<br>Stronger Together.</h2><div class="studio-values"><div>${icon("music")}<span>Creative<br>Value</span></div><div>${icon("people")}<span>Builders</span></div><div>${icon("signal")}<span>Loop<br>Activity</span></div><div>${icon("heart")}<span>Recognized<br>Impact</span></div></div></article></section>`,
+      `<section class="scene proof-scene scene03 proof-enter absolute inset-0 overflow-hidden font-sans text-bema-navy">${renderBrand()}${renderLiveBadge()}<div class="scene03-presenter-space" aria-label="Presenter camera placement"></div><article class="studio-display mr-20 "><h2>Better Benefits.<br>Stronger Together.</h2><div class="studio-values"><div>${icon("music")}<span>Creative<br>Value</span></div><div>${icon("people")}<span>Builders</span></div><div>${icon("signal")}<span>Loop<br>Activity</span></div><div>${icon("heart")}<span>Recognized<br>Impact</span></div></div></article></section>`,
     );
   },
   renderForeground() {

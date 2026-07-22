@@ -169,7 +169,7 @@ export const scene24 = {
         <div><h3 class="text-[25px] font-black ${text}">${item.title}</h3><p class="mt-2 text-[17px] font-semibold leading-relaxed text-[#12235d]">${item.copy}</p></div>
       </article>`
     }).join('')
-    const body = `<section class="absolute left-[34%] top-[135px] z-20 w-[25%] text-center">
+    const body = `<section class="major-scene-heading absolute left-[34%] top-[135px] z-20 w-[25%] text-center">
         <h2 class="font-display text-[58px] font-black leading-[1.08] tracking-[-.045em] text-[#071b59]">RECOGNIZED<br/>IMPACT<br/>EXPLAINED</h2>
         <div class="mx-auto mt-6 flex w-[310px] items-center gap-4 text-cyan-500"><span class="h-0.5 flex-1 bg-cyan-500"></span><span class="text-2xl">♥</span><span class="h-0.5 flex-1 bg-cyan-500"></span></div>
         <p class="mt-5 text-[22px] font-semibold leading-relaxed text-[#16255c]">Acknowledging real value<br/>created through verified movement.</p>

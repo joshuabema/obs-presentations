@@ -3,7 +3,7 @@ function Markup({ html }) {
 }
 
 const logo = `
-  <div class="absolute left-12 top-9 z-30 flex items-center gap-3">
+  <div class="scene-brand-lockup absolute left-12 top-9 z-30 flex items-center gap-3">
     <img class="h-14 w-14" src="/assets/logos/bemahub-reference-mark.svg" alt="" />
     <img class="h-10 w-auto" src="/assets/logos/bemahub-wordmark.svg" alt="BemaHub" />
   </div>`
@@ -19,7 +19,7 @@ export function renderTailwindUnderlay({ title, subtitle, body, titleClass = '' 
       <div class="absolute inset-0 bg-gradient-to-br from-white/90 via-sky-50/75 to-indigo-100/60"></div>
       <div class="absolute inset-y-0 left-0 w-[34%] border-r border-white/25 bg-white/10" aria-label="Presenter camera placement"></div>
       ${logo}${live}
-      <header class="absolute left-[35%] right-14 top-10 z-20 text-center ${titleClass}">
+      <header class="major-scene-heading absolute left-[35%] right-14 top-10 z-20 text-center ${titleClass}">
         <h2 class="font-display text-[58px] font-black leading-[.94] tracking-[-.045em] text-[#071b59]">${title}</h2>
         <p class="mt-3 text-[24px] font-semibold text-[#16255c]">${subtitle}</p>
         <div class="mx-auto mt-4 flex w-[430px] items-center gap-4 text-cyan-500"><span class="h-0.5 flex-1 bg-cyan-500"></span><span class="text-2xl">♥</span><span class="h-0.5 flex-1 bg-cyan-500"></span></div>

@@ -172,7 +172,7 @@ export const scene27 = {
     ]
     return renderTailwindCanvas(`
       <div class="absolute inset-y-0 left-0 w-[30%] border-r border-white/30 bg-white/10" aria-label="Large presenter profile placement"></div>
-      <header class="absolute left-[29.5%] top-[155px] z-20 w-[19%] px-5 text-center">
+      <header class="major-scene-heading absolute left-[29.5%] top-[155px] z-20 w-[19%] px-5 text-center">
         <h2 class="font-display text-[60px] font-black leading-[.9] tracking-[-.05em] text-[#071b59]"><span class="bg-gradient-to-r from-blue-600 to-violet-700 bg-clip-text text-transparent">EVENT</span><br/>DETAIL PAGE</h2>
         <div class="mx-auto mt-6 flex w-56 items-center gap-3 text-cyan-500"><span class="h-1 flex-1 bg-cyan-500"></span><span class="text-2xl">♥</span><span class="h-1 flex-1 bg-cyan-500"></span></div>
         <p class="mt-6 text-[24px] font-bold leading-[1.3] text-[#16255c]">See the event story,<br/>schedule, and<br/>registration path.</p>

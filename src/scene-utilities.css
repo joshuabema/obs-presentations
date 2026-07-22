@@ -10091,4 +10091,65 @@
     background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(224,242,254,.98));
     box-shadow: 0 0 0 4px rgba(34, 211, 238, .18), 0 18px 38px rgba(30, 64, 175, .18);
   }
+
+  /* Scene 01 reference typography and brand lockup, shared by scenes 01–37. */
+  html[data-scene]:not([data-scene="38"]):not([data-scene="39"]) :is(
+    .scene01-heading .stage-title,
+    .scene02-copy > h2,
+    .studio-display > h2,
+    .scene05-title-wrap > h2,
+    .scene08-heading > h2,
+    .scene14-heading > h2,
+    .layered-scene-heading > h2,
+    .major-scene-heading > h2
+  ) {
+    font-family: "Inter Variable", "Inter", "Helvetica Neue", Arial, sans-serif !important;
+    font-size: 72px !important;
+    font-style: normal;
+    font-weight: 900 !important;
+    font-variation-settings: "wght" 900;
+    letter-spacing: -0.045em !important;
+  }
+
+  html[data-scene]:not([data-scene="38"]):not([data-scene="39"]) :is(
+    .broadcast-brand,
+    .scene-brand-lockup
+  ) {
+    position: absolute !important;
+    z-index: 30 !important;
+    top: 76px !important;
+    left: 72px !important;
+    display: flex !important;
+    width: auto !important;
+    height: 68px !important;
+    align-items: center !important;
+    gap: 12px !important;
+    transform: none !important;
+  }
+
+  html[data-scene]:not([data-scene="38"]):not([data-scene="39"]) :is(
+    .broadcast-brand,
+    .scene-brand-lockup
+  ) > img:first-of-type,
+  html[data-scene]:not([data-scene="38"]):not([data-scene="39"]) .scene01-brand > .scene-brand-mark {
+    position: static !important;
+    inset: auto !important;
+    width: 68px !important;
+    height: 68px !important;
+    flex: 0 0 68px !important;
+    object-fit: contain !important;
+  }
+
+  html[data-scene]:not([data-scene="38"]):not([data-scene="39"]) :is(
+    .broadcast-brand,
+    .scene-brand-lockup
+  ) > img:nth-of-type(2),
+  html[data-scene]:not([data-scene="38"]):not([data-scene="39"]) .scene01-wordmark {
+    position: static !important;
+    inset: auto !important;
+    width: 242px !important;
+    height: 68px !important;
+    flex: 0 0 242px !important;
+    object-fit: contain !important;
+  }
 }

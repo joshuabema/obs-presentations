@@ -166,7 +166,7 @@ export const scene37 = {
     const progress = Math.max(0, Math.min(100, Number(live.goal.progress_percent) || 0))
     return renderTailwindCanvas(`
       <div class="absolute inset-y-0 left-0 w-[27%] border-r border-white/30 bg-white/10" aria-label="Large presenter profile placement"></div>
-      <header class="absolute left-[26%] top-[145px] z-20 w-[27%] px-7 text-left">
+      <header class="major-scene-heading absolute left-[26%] top-[145px] z-20 w-[27%] px-7 text-left">
         <h2 class="font-display text-[64px] font-black leading-[.9] tracking-[-.05em] text-[#071b59]">ENROLLMENT<br/>PROGRESS<br/><span class="bg-gradient-to-r from-cyan-500 via-blue-600 to-violet-600 bg-clip-text text-[82px] text-transparent">LIVE</span> <span class="text-[55px] text-violet-600">◉</span></h2>
         <div class="mt-6 h-1 w-28 rounded-full bg-cyan-500"></div>
         <p class="mt-5 text-[27px] font-bold leading-tight text-[#16255c]">Real-time movement as<br/>viewers take action.</p>

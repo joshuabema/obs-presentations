@@ -75,7 +75,8 @@ export const scene01 = {
         </div>
 
         <header class="scene01-top">
-          <div class="scene01-brand">
+          <div class="scene01-brand scene-brand-lockup">
+            <img class="scene-brand-mark" src="/assets/logos/bemahub-reference-mark.svg" alt="" data-asset-image />
             <div class="scene01-wordmark" data-asset-wrapper aria-label="bemaHub">
               <img src="${ASSET_PATHS.logos.wordmark}" alt="bemaHub wordmark" data-asset-image />
               <strong class="scene01-wordmark-fallback"><span class="scene01-wordmark-bema">bema</span><span class="scene01-wordmark-hub">Hub</span></strong>
