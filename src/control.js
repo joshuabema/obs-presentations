@@ -80,6 +80,33 @@ function render() {
             </div>
           </article>
 
+          <article class="control-panel data-mode-panel">
+            <div class="panel-heading"><div><span>Scene 01 · 08 · 37 &amp; global ticker</span><h2>Live data source</h2></div></div>
+            <div class="data-mode-layout">
+              <div class="data-mode-tools">
+                <p>Choose where the live counters, activity feed, and ticker read their numbers from. Every other scene is unaffected.</p>
+                <div class="data-mode-actions">
+                  ${controlButton('Simulated', 'set-data-mode', 'simulated', { kind: state.dataMode === 'simulated' ? 'primary' : 'quiet', active: state.dataMode === 'simulated' })}
+                  ${controlButton('Backend (live)', 'set-data-mode', 'live', { kind: state.dataMode === 'live' ? 'primary' : 'quiet', active: state.dataMode === 'live' })}
+                  ${controlButton('Hybrid', 'set-data-mode', 'hybrid', { kind: state.dataMode === 'hybrid' ? 'primary' : 'quiet', active: state.dataMode === 'hybrid' })}
+                </div>
+              </div>
+              <form data-data-range-form>
+                <label>Cue backend data from a date to today</label>
+                <p class="data-range-hint">Sets the backend session start so joins, actions, referrals, QR scans, and CTA clicks reflect that date through the current day. Applies only when the data source is Backend or Hybrid.</p>
+                <div class="data-range-row">
+                  <input type="date" name="since" data-data-range-since value="${escapeHtml(state.dataRange.since ? state.dataRange.since.slice(0, 10) : '')}" ${busy ? 'disabled' : ''}>
+                  <span>through today</span>
+                  <div class="data-range-actions">
+                    <button type="submit" ${busy ? 'disabled' : ''}>Apply range</button>
+                    <button type="button" data-action="clear-data-range" ${busy ? 'disabled' : ''}>Clear</button>
+                  </div>
+                </div>
+                ${state.dataRange.since ? `<p class="data-range-active">Active range: ${escapeHtml(new Date(state.dataRange.since).toLocaleDateString())} → today</p>` : ''}
+              </form>
+            </div>
+          </article>
+
           <article class="control-panel ticker-panel">
             <div class="panel-heading"><div><span>Shared foreground</span><h2>Global live ticker</h2></div></div>
             <div class="ticker-control-layout">
@@ -147,9 +174,17 @@ function bindControls() {
       if (action === 'toggle-ticker') run(() => updateSharedState({ ticker: { visible: !snapshot.state.ticker.visible } }))
       if (action === 'toggle-ticker-pause') run(() => updateSharedState({ ticker: { paused: !snapshot.state.ticker.paused } }))
       if (action === 'clear-announcement') run(() => updateSharedState({ ticker: { priorityMessage: '', priorityId: snapshot.state.ticker.priorityId + 1 } }))
+      if (action === 'set-data-mode') run(() => updateSharedState({ dataMode: value }))
+      if (action === 'clear-data-range') run(() => updateSharedState({ dataRange: { since: '', until: '' } }))
     })
   })
   app.querySelector('[data-control-mode]')?.addEventListener('change', (event) => run(() => updateSharedState({ mode: event.target.value })))
+  app.querySelector('[data-data-range-form]')?.addEventListener('submit', (event) => {
+    event.preventDefault()
+    const since = new FormData(event.currentTarget).get('since')?.toString().trim() || ''
+    if (!since) return
+    run(() => updateSharedState({ dataRange: { since: new Date(`${since}T00:00:00Z`).toISOString(), until: '' } }))
+  })
   app.querySelector('[data-announcement-form]')?.addEventListener('submit', (event) => {
     event.preventDefault()
     const message = new FormData(event.currentTarget).get('message')?.toString().trim() || ''

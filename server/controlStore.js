@@ -8,6 +8,11 @@ const DEFAULT_STATE = Object.freeze({
   animationsPaused: false,
   backgroundVideo: true,
   selectedQuestion: 1,
+  dataMode: 'simulated',
+  dataRange: {
+    since: '',
+    until: '',
+  },
   ticker: {
     visible: true,
     paused: false,
@@ -22,6 +27,13 @@ const DEFAULT_STATE = Object.freeze({
 })
 
 const MODES = new Set(['reference', 'overlay', 'live'])
+const DATA_MODES = new Set(['simulated', 'live', 'hybrid'])
+
+function normalizeDateInput(value) {
+  const text = String(value ?? '').trim().slice(0, 40)
+  if (!text) return ''
+  return Number.isNaN(Date.parse(text)) ? '' : text
+}
 
 function cloneDefaultState() {
   return structuredClone(DEFAULT_STATE)
@@ -43,6 +55,11 @@ function normalizeState(value) {
     selectedQuestion: Number(source.selectedQuestion) >= 1 && Number(source.selectedQuestion) <= 4
       ? Number(source.selectedQuestion)
       : defaults.selectedQuestion,
+    dataMode: DATA_MODES.has(source.dataMode) ? source.dataMode : defaults.dataMode,
+    dataRange: {
+      since: normalizeDateInput(source.dataRange?.since),
+      until: normalizeDateInput(source.dataRange?.until),
+    },
     ticker: {
       visible: source.ticker?.visible !== false,
       paused: Boolean(source.ticker?.paused),
@@ -61,6 +78,7 @@ function mergeState(current, patch) {
   const next = {
     ...current,
     ...(patch && typeof patch === 'object' ? patch : {}),
+    dataRange: { ...current.dataRange, ...(patch?.dataRange ?? {}) },
     ticker: { ...current.ticker, ...(patch?.ticker ?? {}) },
     command: { ...current.command, ...(patch?.command ?? {}) },
   }

@@ -48,10 +48,20 @@ scene-specific During cue, and Exit. It also controls global animation pause,
 background video/posters, live/reference/overlay mode, the ticker, and priority
 announcements. Scene 36 question selection follows its active scene controls.
 
+The **Live data source** panel controls where Scenes 01, 08, 37, and the global
+ticker read their numbers from: **Simulated**, **Backend (live)**, or **Hybrid**.
+It also provides a **date picker to cue backend data from a chosen date through
+today** — this sets the backend session start so joined counts, actions,
+referrals, QR scans, and CTA clicks reflect that date range rather than only
+"since page load." The date range applies only when the source is Backend or
+Hybrid, and a **Clear** button returns to the default rolling session window.
+
 Every button writes to SQLite through the control API. Connected display pages
 receive that revision over server-sent events. A display opened later restores
-the current scene, cue, question, ticker, and animation settings from the
-database rather than starting from local browser state.
+the current scene, cue, question, ticker, animation, data source, and data
+range settings from the database rather than starting from local browser
+state. Changing the data source or date range reloads every connected display
+so the OBS live-data client picks up the new query parameters consistently.
 
 Reference storyboard mode displays the complete original storyboard sheet at
 its natural aspect ratio and allows the page to scroll to its specification
@@ -107,6 +117,8 @@ Static development URLs:
 - Scene 08 presenter inset side — add `&presenterInset=right` (defaults to `left`)
 - Production API data (Scenes 01, 08, 37 and the ticker) — add `&dataMode=live&sessionId=open_enrollment_2026`
 - Rehearsal/mock data — add `&dataMode=simulated` (the default)
+- Blend live and simulated fields — add `&dataMode=hybrid`
+- Cue backend data from a date through today — add `&dataSince=2026-07-01T00:00:00.000Z` (sets the backend session start so joins/actions/referrals/QR scans/CTA clicks reconcile from that date forward); pair with `&dataMode=live` or `&dataMode=hybrid`
 - Override the API root — add `&apiBase=https%3A%2F%2Fexample.test%2Fwp-json%2Fbmh%2Fv1%2Fobs`
 - Force the global ticker on or off — add `&ticker=show` or `&ticker=hide`
 
@@ -134,11 +146,24 @@ Its live activity queue still has a local fallback, while operator visibility,
 pause, and priority-announcement settings are stored centrally and synchronized
 to every system through the control server.
 
+The control room's **Live data source** panel switches this data between
+**Simulated**, **Backend (live)**, and **Hybrid** without editing URLs, and its
+date picker cues the backend to report data from a chosen date through the
+current day (see "Control room" above). The ticker status pill reflects the
+active source as `SIM`, `LIVE`, or `HYBRID`.
+
 The control room provides Show/Hide, Pause/Resume, clear-announcement, and a
 shared priority announcement. The ticker continues receiving safe public
 activity while hidden or paused. It is muted by default on Scenes 38 and 39;
 use `ticker=show` when it should remain visible there. API activity is rendered
 only when `safe_for_public_display` is explicitly `true`.
+
+The client (`src/obsLiveData.js`) reads `live-stats`, `goal-progress`,
+`live-activity`, and `session-stats` from the Bema Hub OBS API
+(`/wp-json/bmh/v1/obs`, documented in the backend repo's
+`documentation/OBS_API.md`). That API also now exposes
+`presentation-config`, `open-enrollment`, `events`, and `creators` for future
+scenes; the presentation layer does not consume those yet.
 
 Scene 36 question buttons are operator selections. Selection persists across a
 reload, and four curated questions can be supplied with repeated `qa` query

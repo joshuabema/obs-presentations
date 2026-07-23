@@ -78,11 +78,19 @@ export function getInitialLiveData() {
   }
 }
 
+function normalizeDateParam(value) {
+  if (!value) return ''
+  const parsed = new Date(value)
+  return Number.isNaN(parsed.getTime()) ? '' : parsed.toISOString()
+}
+
 export function createObsLiveClient(params = new URLSearchParams()) {
   const dataMode = ['live', 'hybrid', 'simulated'].includes(params.get('dataMode')) ? params.get('dataMode') : 'simulated'
   const apiBase = normalizeBase(params.get('apiBase'))
   const sessionId = params.get('sessionId') || 'open_enrollment_2026'
   const useApi = params.get('dataSource') === 'api' || dataMode === 'live' || dataMode === 'hybrid'
+  const rangeSince = normalizeDateParam(params.get('dataSince'))
+  const rangeUntil = normalizeDateParam(params.get('dataUntil'))
   let controller = null
 
   async function request(path, query = {}) {
@@ -103,8 +111,12 @@ export function createObsLiveClient(params = new URLSearchParams()) {
       const [stats, goal, activity, session] = await Promise.all([
         request('live-stats'),
         request('goal-progress'),
-        request('live-activity', { limit: 25 }),
-        request('session-stats', { scope: 'session', session_id: sessionId }),
+        request('live-activity', { limit: 25, since: rangeSince }),
+        request('session-stats', {
+          scope: 'session',
+          session_id: sessionId,
+          started_at: rangeSince || undefined,
+        }),
       ])
       return normalizePayload(stats, goal, activity, session)
     } catch (error) {
@@ -118,7 +130,7 @@ export function createObsLiveClient(params = new URLSearchParams()) {
     controller?.abort()
     controller = new AbortController()
     try {
-      const activity = await request('live-activity', { limit: 25 })
+      const activity = await request('live-activity', { limit: 25, since: rangeSince })
       return publicActivity(activity?.items)
     } catch (error) {
       if (error.name === 'AbortError') throw error
@@ -126,7 +138,7 @@ export function createObsLiveClient(params = new URLSearchParams()) {
     }
   }
 
-  return { poll, pollActivity, abort: () => controller?.abort(), dataMode, apiBase, useApi }
+  return { poll, pollActivity, abort: () => controller?.abort(), dataMode, apiBase, useApi, rangeSince, rangeUntil }
 }
 
 function setText(root, selector, value) {

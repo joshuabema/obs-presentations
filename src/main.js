@@ -100,6 +100,13 @@ async function boot() {
     ? params.get('render')
     : VALID_RENDERS.has(requestedOutput) ? requestedOutput : 'composite'
   if (sharedState) params.set('bgVideo', String(sharedState.backgroundVideo))
+  if (sharedState) {
+    params.set('dataMode', sharedState.dataMode)
+    if (sharedState.dataRange?.since) params.set('dataSince', sharedState.dataRange.since)
+    else params.delete('dataSince')
+    if (sharedState.dataRange?.until) params.set('dataUntil', sharedState.dataRange.until)
+    else params.delete('dataUntil')
+  }
   const clean = params.get('clean') === 'true'
   const controllerPreview = params.get('controllerPreview') === 'true'
   const paused = sharedState?.animationsPaused ?? (params.get('paused') === 'true')
@@ -230,6 +237,9 @@ function syncSharedPresentation(nextSnapshot, context) {
   const requiresReload = next.sceneId !== context.slide.id
     || next.mode !== context.mode
     || next.backgroundVideo !== previous?.backgroundVideo
+    || next.dataMode !== previous?.dataMode
+    || next.dataRange?.since !== previous?.dataRange?.since
+    || next.dataRange?.until !== previous?.dataRange?.until
     || (context.slide.id === '36' && next.selectedQuestion !== previous?.selectedQuestion && next.command.sequence === lastSharedCommandSequence)
   if (requiresReload) {
     const url = new URL(location.href)
@@ -237,6 +247,11 @@ function syncSharedPresentation(nextSnapshot, context) {
     url.searchParams.set('mode', next.mode)
     url.searchParams.set('bgVideo', String(next.backgroundVideo))
     url.searchParams.set('question', String(next.selectedQuestion))
+    url.searchParams.set('dataMode', next.dataMode)
+    if (next.dataRange?.since) url.searchParams.set('dataSince', next.dataRange.since)
+    else url.searchParams.delete('dataSince')
+    if (next.dataRange?.until) url.searchParams.set('dataUntil', next.dataRange.until)
+    else url.searchParams.delete('dataUntil')
     location.replace(url)
     return
   }

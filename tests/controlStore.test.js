@@ -30,6 +30,34 @@ test('shared presentation state persists across store restarts', () => {
   }
 })
 
+test('data mode and date range are validated and persisted', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'obs-control-data-mode-'))
+  const databasePath = join(directory, 'state.sqlite')
+  try {
+    const store = createControlStore(databasePath)
+    const defaults = store.read()
+    assert.equal(defaults.state.dataMode, 'simulated')
+    assert.equal(defaults.state.dataRange.since, '')
+
+    const invalid = store.write({ dataMode: 'not-a-mode' })
+    assert.equal(invalid.state.dataMode, 'simulated')
+
+    const live = store.write({ dataMode: 'live', dataRange: { since: '2026-07-01T00:00:00.000Z' } })
+    assert.equal(live.state.dataMode, 'live')
+    assert.equal(live.state.dataRange.since, '2026-07-01T00:00:00.000Z')
+
+    const hybrid = store.write({ dataMode: 'hybrid' })
+    assert.equal(hybrid.state.dataMode, 'hybrid')
+    assert.equal(hybrid.state.dataRange.since, '2026-07-01T00:00:00.000Z', 'unrelated patch should not clear an existing range')
+
+    const cleared = store.write({ dataRange: { since: '' } })
+    assert.equal(cleared.state.dataRange.since, '')
+    store.close()
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
+
 test('commands increment a durable sequence and validate scene values', () => {
   const directory = mkdtempSync(join(tmpdir(), 'obs-control-command-'))
   const databasePath = join(directory, 'state.sqlite')

@@ -192,7 +192,8 @@ export function initGlobalTicker(root, context) {
     element.classList.toggle('is-disconnected', !state.connected)
     element.dataset.tickerSequence = String(state.sequence)
     element.querySelector('[data-global-ticker-track]').innerHTML = renderTrack(state)
-    element.querySelector('[data-global-ticker-status]').textContent = state.connected ? (ticker.client.useApi ? 'LIVE' : 'SIM') : 'OFFLINE'
+    const modeLabel = { live: 'LIVE', hybrid: 'HYBRID', simulated: 'SIM' }[ticker.client.dataMode] || 'SIM'
+    element.querySelector('[data-global-ticker-status]').textContent = state.connected ? modeLabel : 'OFFLINE'
   }
   const unsubscribe = ticker.subscribe(sync)
   ticker.connect({ paused: context.paused })
