@@ -15,6 +15,42 @@ const ASSET_PATHS = {
   },
 };
 
+const LOWER_THIRD_ROTATION_SECONDS = 5;
+const LOWER_THIRD_MESSAGES = [
+  "Where are you building from?",
+  "What if your network could become your advantage?",
+  "Are you building alone when you could be building with support?",
+  "What kind of impact do you want your voice to create?",
+  "Who already trusts your voice?",
+  "How much stronger could a project become with community behind it?",
+  "What project would you be proud to help carry?",
+  "What could move further because you shared it?",
+  "Get ready to see how Bema Hub works.",
+  "What would it mean to turn belief into momentum?",
+  "Are you maximizing your connections or overlooking them?",
+  "What if the people you need are closer than you think?",
+  "How many people trust you more than you realize?",
+  "What would change if your network became a source of strength?",
+  "What if your story could become someone else's proof?",
+  "What if support could be relational, not transactional?",
+  "Are you ready to fuel a project?",
+  "What if your reach could help an artist move further?",
+  "Bema Hub turns shared belief into collective momentum.",
+  "Are you ready for action?",
+  "Are you ready to move from interest to participation?",
+  "What if the right question opens the right conversation?",
+  "What would happen if you shared naturally with people who trust you?",
+  "Are you ready to help a project become a movement?",
+  "What if your next step is simpler than you think?",
+  "Your voice carries trust. What will you do with it?",
+  "How would your future self want you to respond in this moment?",
+  "No pressure. No minimums. Grow at your own pace.",
+  "Scan when you're ready to begin.",
+].map((question, index) => ({
+  id: String(index + 1).padStart(2, "0"),
+  question,
+}));
+
 function SceneMarkup({ html }) {
   return html ? (
     <div
@@ -52,7 +88,7 @@ export const scene01 = {
       )
       .join("");
 
-    const firstPrompt = context.questions[0] ?? {
+    const firstPrompt = LOWER_THIRD_MESSAGES[0] ?? {
       id: "01",
       question: "Where are you building from today?",
       subtext: "Drop your city or country in chat.",
@@ -143,6 +179,10 @@ export const scene01 = {
           style="--in-duration:${firstPrompt.animation_in_duration_ms}ms;--out-duration:${firstPrompt.animation_out_duration_ms}ms"
         >
           <article class="countdown-question is-visible">
+            <svg class="scene01-question-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-5.25 4.2A.75.75 0 0 1 3.5 18.6V5.5H4Z" />
+              <path d="M8 8h8M8 11h5" />
+            </svg>
             <p data-question-text class="text-3xl">${firstPrompt.question}</p>
           </article>
         </section>
@@ -201,30 +241,7 @@ export const scene01 = {
     const totalDuration = Number(
       countdownRoot.dataset.countdownDuration || 600,
     );
-    const prompts = context?.questions?.length
-      ? context.questions
-      : [
-          {
-            id: "01",
-            question: "Where are you building from today?",
-            subtext: "Drop your city or country in chat.",
-            placement: "lower_right",
-            animation_in: "fadeUp",
-            animation_out: "fadeDown",
-            hold_effect: "floatSlow",
-            easing: "easeOutCubic",
-            animation_in_duration_ms: 650,
-            animation_out_duration_ms: 500,
-            background_cue: "soft_cyan_pulse",
-            qr_visibility: "visible",
-            ticker_override: "",
-            api_trigger: "",
-            start_sec: 0,
-            duration_sec: totalDuration,
-            start_time: "00:00",
-            end_time: "10:00",
-          },
-        ];
+    const prompts = LOWER_THIRD_MESSAGES;
     let remainingSeconds = totalDuration;
     let activePromptId = null;
     const defaultTickerMarkup = tickerTrack?.innerHTML ?? "";
@@ -233,7 +250,6 @@ export const scene01 = {
       if (
         !questionWrap ||
         !questionTextNode ||
-        !questionIndexNode ||
         !prompt ||
         prompt.id === activePromptId
       ) {
@@ -274,7 +290,9 @@ export const scene01 = {
       questionPanel?.classList.remove("is-visible");
       window.clearTimeout(window.__bemahubQuestionFade);
       window.__bemahubQuestionFade = window.setTimeout(() => {
-        questionIndexNode.textContent = `Prompt ${prompt.id}`;
+        if (questionIndexNode) {
+          questionIndexNode.textContent = `Prompt ${prompt.id}`;
+        }
         questionTextNode.textContent = prompt.question;
         if (questionSubtextNode) {
           questionSubtextNode.textContent = prompt.subtext || "";
@@ -317,12 +335,12 @@ export const scene01 = {
       activePromptId = prompt.id;
     };
 
-    const findActivePrompt = (elapsedSeconds) =>
-      prompts.find((prompt) => {
-        const start = Number(prompt.start_sec || 0);
-        const duration = Number(prompt.duration_sec || 0);
-        return elapsedSeconds >= start && elapsedSeconds < start + duration;
-      });
+    const findActivePrompt = (elapsedSeconds) => {
+      const promptIndex =
+        Math.floor(elapsedSeconds / LOWER_THIRD_ROTATION_SECONDS) %
+        prompts.length;
+      return prompts[promptIndex];
+    };
 
     const updateCountdown = () => {
       const minutes = Math.floor(remainingSeconds / 60);

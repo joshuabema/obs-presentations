@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { LAYER_CUES } from '../src/sceneCueEngine.js'
-import { sceneControlById } from '../src/sceneControls.js'
+import { sceneControlById, sceneControls } from '../src/sceneControls.js'
 
 const layerCueIds = Object.values(LAYER_CUES)
 
@@ -11,6 +11,13 @@ const outputs = [
   ['obs', 'foreground'],
   ['obs', 'composite'],
 ]
+
+test('every scene declares a positive controller duration', () => {
+  expect(sceneControls).toHaveLength(39)
+  sceneControls.forEach((scene) => {
+    expect(scene.durationSeconds).toBeGreaterThan(0)
+  })
+})
 
 function collectRuntimeErrors(page) {
   const errors = []
@@ -99,10 +106,52 @@ test('legacy presentation controls, debug state, navigation, and cue lifecycle r
   await expect(page).toHaveURL(/scene=08/)
 })
 
+test('Scene 04 reveal controls advance the three statements independently', async ({ page }) => {
+  await page.goto('/?scene=04&mode=live&output=storyboard&render=composite&paused=true&bgVideo=false&legacyControls=true')
+  const reveals = page.locator('.scene04-statement-reveal')
+
+  await page.locator('[data-reset-scene]').click()
+  await page.locator('[data-trigger-cue="statement-1"]').click()
+  await expect(reveals.nth(0)).toHaveClass(/is-cue-complete/)
+  await expect(reveals.nth(1)).not.toHaveClass(/is-cue-complete/)
+  await expect(reveals.nth(2)).not.toHaveClass(/is-cue-complete/)
+
+  await page.locator('[data-trigger-cue="statement-2"]').click()
+  await expect(reveals.nth(0)).toHaveClass(/is-cue-complete/)
+  await expect(reveals.nth(1)).toHaveClass(/is-cue-complete/)
+  await expect(reveals.nth(2)).not.toHaveClass(/is-cue-complete/)
+
+  await page.locator('[data-trigger-cue="statement-3"]').click()
+  await expect(reveals.nth(0)).toHaveClass(/is-cue-complete/)
+  await expect(reveals.nth(1)).toHaveClass(/is-cue-complete/)
+  await expect(reveals.nth(2)).toHaveClass(/is-cue-complete/)
+})
+
+test('Scene 05 agenda matches the approved reference order', async ({ page }) => {
+  await page.goto('/?scene=05&mode=live&output=storyboard&render=composite&paused=true&bgVideo=false')
+  await expect(page.locator('.scene05-agenda-title')).toHaveText([
+    'Welcome',
+    'What is Bema Hub',
+    'What is Bema CORE',
+    'Impact Statistics',
+    'Programs Overview',
+    'Participation Journey',
+    'EchoLoop',
+    'Access Levels',
+    'Community Builder Tiers',
+    'Live Enrollment',
+  ])
+})
+
 test('global ticker controls persist across scene changes without resetting the queue', async ({ page }) => {
   await page.goto('/?scene=07&mode=live&output=storyboard&render=composite&paused=true&bgVideo=false&legacyControls=true')
   const ticker = page.locator('[data-global-live-ticker]')
+  const stage = page.getByTestId('visual-stage')
+  const footer = page.locator('.foreground-bar')
   await expect(ticker).toBeVisible()
+  await expect(ticker).toHaveCSS('height', '86px')
+  await expect(stage).toHaveClass(/is-global-ticker-active/)
+  await expect(footer).toHaveCSS('visibility', 'hidden')
 
   await page.locator('[data-ticker-command="clear"]').click()
   await expect(ticker.locator('[data-ticker-item-id="empty"]').first()).toContainText('Waiting for live activity')
@@ -121,8 +170,12 @@ test('global ticker controls persist across scene changes without resetting the 
 
   await page.locator('[data-ticker-command="toggle-visible"]').click()
   await expect(page.locator('[data-global-live-ticker]')).toHaveClass(/is-hidden/)
+  await expect(stage).not.toHaveClass(/is-global-ticker-active/)
+  await expect(footer).toHaveCSS('visibility', 'visible')
   await page.locator('[data-ticker-command="toggle-visible"]').click()
   await expect(page.locator('[data-global-live-ticker]')).not.toHaveClass(/is-hidden/)
+  await expect(stage).toHaveClass(/is-global-ticker-active/)
+  await expect(footer).toHaveCSS('visibility', 'hidden')
   await page.locator('[data-ticker-command="reconnect"]').click()
   await expect(page.locator('[data-global-ticker-status]')).toHaveText(/SIM|LIVE/)
 })
@@ -152,10 +205,13 @@ test('shared control room synchronizes scenes, cues, animation state, and ticker
     await firstDisplay.goto('/?sync=true&output=obs&render=composite&clean=true&bgVideo=false')
     await control.goto('/control')
     await expect(control.getByRole('heading', { name: 'OBS Control Room' })).toBeVisible()
+    await expect(control.locator('[data-scene-countdown]')).toHaveText(/^\d{2}:\d{2}$/)
+    await expect(control.locator('.connection-card')).not.toContainText('Revision')
 
     await test.step('change the active scene', async () => {
       await control.locator('[data-action="scene"][data-value="08"]').click()
       await expect(firstDisplay.locator('html')).toHaveAttribute('data-scene', '08')
+      await expect(control.locator('[data-scene-countdown]')).toHaveText(/^01:[2-3]\d$/)
       await expect(firstDisplay.getByTestId('visual-stage')).toHaveAttribute('data-active-cue', LAYER_CUES.background)
       await expect(firstDisplay.getByTestId('visual-stage')).toHaveClass(/is-layer-background-visible/)
       await expect(firstDisplay.getByTestId('visual-stage')).not.toHaveClass(/is-layer-foreground-visible/)

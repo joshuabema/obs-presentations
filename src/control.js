@@ -8,6 +8,31 @@ let snapshot
 let connectionStatus = 'connecting'
 let busy = false
 let errorMessage = ''
+let countdownSceneId = ''
+let countdownEndsAt = 0
+
+function formatCountdown(totalSeconds) {
+  const seconds = Math.max(0, Math.ceil(totalSeconds))
+  const minutes = Math.floor(seconds / 60)
+  return `${String(minutes).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`
+}
+
+function ensureSceneCountdown(sceneId, durationSeconds) {
+  if (countdownSceneId === sceneId) return
+  countdownSceneId = sceneId
+  countdownEndsAt = Date.now() + durationSeconds * 1000
+}
+
+function updateSceneCountdownDisplay() {
+  const countdown = app.querySelector('[data-scene-countdown]')
+  const status = app.querySelector('[data-scene-countdown-status]')
+  if (!countdown || !status) return
+  const remainingSeconds = Math.max(0, (countdownEndsAt - Date.now()) / 1000)
+  const isComplete = remainingSeconds <= 0
+  countdown.textContent = formatCountdown(remainingSeconds)
+  countdown.classList.toggle('is-complete', isComplete)
+  status.textContent = isComplete ? 'Switch scene' : 'Scene time remaining'
+}
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character])
@@ -26,6 +51,8 @@ function render() {
 
   const state = snapshot.state
   const config = sceneControlById[state.sceneId]
+  ensureSceneCountdown(state.sceneId, config.durationSeconds)
+  const initialCountdown = formatCountdown((countdownEndsAt - Date.now()) / 1000)
   const sceneNumber = Number(state.sceneId)
   const previous = String(sceneNumber === 1 ? 39 : sceneNumber - 1).padStart(2, '0')
   const next = String(sceneNumber === 39 ? 1 : sceneNumber + 1).padStart(2, '0')
@@ -50,7 +77,8 @@ function render() {
         </div>
         <div class="connection-card">
           <span class="connection-dot is-${connectionStatus}"></span>
-          <div><strong>${connectionStatus === 'connected' ? 'Live sync connected' : connectionStatus === 'reconnecting' ? 'Reconnecting…' : 'Connecting…'}</strong><small>Revision ${snapshot.revision} · ${new Date(snapshot.updatedAt).toLocaleTimeString()}</small></div>
+          <div class="connection-copy"><strong>${connectionStatus === 'connected' ? 'Live sync connected' : connectionStatus === 'reconnecting' ? 'Reconnecting…' : 'Connecting…'}</strong><small data-scene-countdown-status>Scene time remaining</small></div>
+          <time class="scene-countdown" data-scene-countdown aria-label="Time remaining for scene ${state.sceneId}">${initialCountdown}</time>
         </div>
       </header>
 
@@ -150,6 +178,7 @@ function render() {
     </main>`
 
   bindControls()
+  updateSceneCountdownDisplay()
 }
 
 async function run(action) {
@@ -216,3 +245,4 @@ async function boot() {
 }
 
 boot()
+window.setInterval(updateSceneCountdownDisplay, 250)

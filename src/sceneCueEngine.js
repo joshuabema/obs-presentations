@@ -130,6 +130,19 @@ export function applySceneCue(root, cue) {
   stage.dataset.activeCue = cue
   stage.dataset.sceneCue = cue
 
+  const statementMatch = /^statement-([1-3])$/.exec(cue)
+  if (statementMatch && stage.querySelector('.scene04')) {
+    const revealThrough = Number(statementMatch[1])
+    stage.querySelectorAll('.scene04-statement-reveal').forEach((element, index) => {
+      const revealed = index < revealThrough
+      element.classList.toggle('is-cue-complete', revealed)
+      element.classList.toggle('is-cue-target', index === revealThrough - 1)
+      if (revealed) element.dataset.cueActive = 'true'
+    })
+    stage.classList.add('is-cue-active', 'cue-during')
+    return
+  }
+
   if (cue === 'entry') {
     setLayerVisibility(stage, ['background'], { replace: true })
     stage.classList.add('cue-layer-background')

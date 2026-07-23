@@ -179,25 +179,41 @@ export function renderGlobalTicker({ slide, url }) {
 function renderTrack(state) {
   const items = state.items.length ? state.items : [{ id: 'empty', message: 'Waiting for live activity…', priority: 'low' }]
   const markup = items.map((item) => `<span class="global-live-ticker-item priority-${escapeHtml(item.priority || 'medium')}" data-ticker-item-id="${escapeHtml(item.id || '')}"><i>•</i>${escapeHtml(item.message)}</span>`).join('')
-  return `${markup}${markup}`
+  return `<span class="global-live-ticker-sequence">${markup}</span><span class="global-live-ticker-sequence" aria-hidden="true">${markup}</span>`
+}
+
+function trackSignature(state) {
+  const items = state.items.length ? state.items : [{ id: 'empty', message: 'Waiting for live activity…', priority: 'low' }]
+  return items.map((item) => `${item.id || ''}\u0000${item.priority || ''}\u0000${item.message || ''}`).join('\u0001')
 }
 
 export function initGlobalTicker(root, context) {
   const element = root.querySelector('[data-global-live-ticker]')
   const ticker = getGlobalTicker(context.url)
   if (!element) return () => {}
+  const stage = element.closest('.visual-stage')
+  const sceneMuted = element.dataset.sceneMuted === 'true'
   const sync = (state) => {
     element.classList.toggle('is-hidden', !state.visible)
     element.classList.toggle('is-paused', state.paused || context.paused)
     element.classList.toggle('is-disconnected', !state.connected)
+    stage?.classList.toggle('is-global-ticker-active', state.visible && !sceneMuted)
     element.dataset.tickerSequence = String(state.sequence)
-    element.querySelector('[data-global-ticker-track]').innerHTML = renderTrack(state)
+    const track = element.querySelector('[data-global-ticker-track]')
+    const signature = trackSignature(state)
+    if (track.dataset.contentSignature !== signature) {
+      track.innerHTML = renderTrack(state)
+      track.dataset.contentSignature = signature
+    }
     const modeLabel = { live: 'LIVE', hybrid: 'HYBRID', simulated: 'SIM' }[ticker.client.dataMode] || 'SIM'
     element.querySelector('[data-global-ticker-status]').textContent = state.connected ? modeLabel : 'OFFLINE'
   }
   const unsubscribe = ticker.subscribe(sync)
   ticker.connect({ paused: context.paused })
-  return unsubscribe
+  return () => {
+    unsubscribe()
+    stage?.classList.remove('is-global-ticker-active')
+  }
 }
 
 export function renderTickerControls() {

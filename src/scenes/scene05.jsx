@@ -1,14 +1,13 @@
 // Scene 05 owns these design primitives so it can be edited independently.
 function renderTicker(items, variant = 'local') {
-  const repeatedItems = [...items, ...items]
-  const itemMarkup = repeatedItems
+  const itemMarkup = items
     .map((item) => `<span class="ticker-item inline-flex shrink-0 items-center gap-5 px-8 text-xl font-bold"><span class="ticker-dot text-bema-cyan">•</span>${item}</span>`)
     .join('')
 
   return `
     <div class="ticker ticker-bar ${variant}-ticker absolute inset-x-0 bottom-0 z-30 flex h-[74px] items-center overflow-hidden border-t border-white/20 bg-[linear-gradient(180deg,var(--ticker-navy),#03133a)] font-sans text-white shadow-2xl backdrop-blur" aria-label="Presentation ticker">
       <span class="ticker-label live-badge relative z-10 inline-flex h-full shrink-0 items-center gap-2 bg-gradient-to-r from-bema-blue to-bema-purple px-8 text-base font-black uppercase tracking-wider before:size-2.5 before:animate-pulse before:rounded-full before:bg-bema-live before:content-['']">Bema CORE Live</span>
-      <div class="ticker-track flex min-w-max items-center animate-[ticker-scroll_28s_linear_infinite]">${itemMarkup}</div>
+      <div class="ticker-track flex min-w-max items-center animate-[ticker-scroll_28s_linear_infinite]"><span class="ticker-sequence">${itemMarkup}</span><span class="ticker-sequence" aria-hidden="true">${itemMarkup}</span></div>
     </div>
   `
 }
@@ -29,6 +28,19 @@ const ASSET_PATHS = {
   },
 }
 
+const REFERENCE_AGENDA = Object.freeze([
+  'Welcome',
+  'What is Bema Hub',
+  'What is Bema CORE',
+  'Impact Statistics',
+  'Programs Overview',
+  'Participation Journey',
+  'EchoLoop',
+  'Access Levels',
+  'Community Builder Tiers',
+  'Live Enrollment',
+])
+
 function SceneMarkup({ html }) {
   return html ? <div data-react-scene-markup="true" dangerouslySetInnerHTML={{ __html: html }} /> : null
 }
@@ -40,7 +52,7 @@ function sceneMarkup(html) {
 export const scene05 = {
   presenterZone: "left",
   renderUnderlay(context) {
-    const agendaRows = resolveAgendaItems(context)
+    const agendaRows = REFERENCE_AGENDA
       .map(
         (item, index) =>
           `<li class="scene05-agenda-row" data-control-cue="agenda-${index + 1}"><span class="scene05-agenda-index">${String(index + 1).padStart(2, "0")}</span><span class="scene05-agenda-title">${item}</span></li>`,
@@ -64,15 +76,3 @@ export const scene05 = {
     );
   },
 };
-
-function resolveAgendaItems(context) {
-  const titles = (context.allSlides ?? [])
-    .slice(0, 10)
-    .map((item) => item.title)
-    .filter(Boolean);
-  return titles.length >= 6
-    ? titles
-    : (context.slide.agenda ?? [])
-        .map((item) => item.title || item.label)
-        .filter(Boolean);
-}
